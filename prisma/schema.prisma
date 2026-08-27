@@ -1,0 +1,296 @@
+// Prisma schema for APC Stakeholders Congress Portal
+// Designed for Kwara State initial rollout + nationwide multi-state scalability
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Geographic Reference Models
+model Country {
+  id        String             @id // e.g. "NGA"
+  name      String
+  isActive  Boolean            @default(true)
+  zones     GeopoliticalZone[]
+}
+
+model GeopoliticalZone {
+  id        Int       @id @default(autoincrement())
+  countryId String
+  country   Country   @relation(fields: [countryId], references: [id])
+  name      String    // e.g. "North Central"
+  code      String    @unique
+  states    State[]
+}
+
+model State {
+  id                  Int                  @id @default(autoincrement())
+  zoneId              Int
+  zone                GeopoliticalZone     @relation(fields: [zoneId], references: [id])
+  name                String               // e.g. "Kwara"
+  code                String               @unique // e.g. "KW"
+  isActive            Boolean              @default(false)
+  senatorialDistricts SenatorialDistrict[]
+  lgas                Lga[]
+  forums              Forum[]
+  users               User[]
+  createdAt           DateTime             @default(now())
+}
+
+model SenatorialDistrict {
+  id        Int       @id @default(autoincrement())
+  stateId   Int
+  state     State     @relation(fields: [stateId], references: [id])
+  name      String    // e.g. "Kwara Central", "Kwara North", "Kwara South", "Kwara State at Large"
+  code      String
+  lgas      Lga[]
+  forums    Forum[]
+}
+
+model Lga {
+  id                   Int                 @id @default(autoincrement())
+  stateId              Int
+  state                State               @relation(fields: [stateId], references: [id])
+  senatorialDistrictId Int?
+  senatorialDistrict   SenatorialDistrict? @relation(fields: [senatorialDistrictId], references: [id])
+  name                 String              // e.g. "Ilorin West", "Edu", "Offa"
+  code                 String
+  isActive             Boolean             @default(true)
+  wards                Ward[]
+  forums               Forum[]
+  events               Event[]
+}
+
+model Ward {
+  id         Int      @id @default(autoincrement())
+  lgaId      Int
+  lga        Lga      @relation(fields: [lgaId], references: [id])
+  name       String   // e.g. "Magaji Ngeri", "Balogun Gambari", "Lafiagi I"
+  wardNumber Int?
+  isActive   Boolean  @default(true)
+  forums     Forum[]
+}
+
+// 2. Forum Registration & Leadership Models
+model Forum {
+  id                     String             @id @default(uuid())
+  registrationRef        String             @unique // e.g. "APCSC-KW-2026-XXXXXX"
+  name                   String
+  acronym                String?
+  motto                  String?
+  yearEstablished        Int
+  areaOfCoverage         String             // "Kwara State at Large", "Kwara Central", "Kwara North", "Kwara South"
+  
+  stateId                Int
+  state                  State              @relation(fields: [stateId], references: [id])
+  senatorialDistrictId   Int?
+  senatorialDistrict     SenatorialDistrict? @relation(fields: [senatorialDistrictId], references: [id])
+  lgaId                  Int
+  lga                    Lga                @relation(fields: [lgaId], references: [id])
+  wardId                 Int?
+  ward                   Ward?              @relation(fields: [wardId], references: [id])
+  wardName               String?            // Fallback if ward not in preset
+  
+  officeAddress          String
+  meetingVenue           String?
+  
+  // Leadership / Contacts
+  coordinatorName        String
+  coordinatorPhone       String
+  coordinatorEmail       String?
+  coordinatorPassportUrl String?
+  secretaryName          String
+  secretaryPhone         String
+  forumEmail             String?
+  socialMediaHandles     String?
+  
+  // Structure & Capacity
+  totalStrength          Int                @default(0)
+  keyActivities          String             // JSON string array e.g. ["Voter Mobilization", "Youth Engagement"]
+  otherActivity          String?
+  hasWhatsappGroup       Boolean            @default(false)
+  whatsappGroupLink      String?
+  additionalCapacityInfo String?
+  
+  // Political Track Record
+  previousElectionActivity String           // "2023", "2019", "Both 2019 and 2023", "This is our first time"
+  rolePlayedLastElection   String?
+  leaderSponsorAlignment   String?
+  
+  // Commitment & Declarations
+  commitWork2027           Boolean          @default(true)
+  agreeWithCongress        Boolean          @default(true)
+  declarationConfirmed     Boolean          @default(true)
+  consentDataProcessing    Boolean          @default(true)
+  
+  // Resources & Support
+  supportNeeded            String           // JSON string array e.g. ["Training", "Logistics"]
+  willingAttendMeetings    String           // "Yes", "No", "Maybe"
+  
+  // Document Uploads
+  resolutionLetterUrl      String?
+  supportingDocumentUrl    String?
+  
+  // Workflow Status
+  status                   String           @default("submitted") // "draft", "submitted", "under_review", "more_info_required", "approved_verified", "rejected", "suspended_revoked"
+  reviewerNotes            String?          // Internal confidential notes
+  queryMessage             String?          // Message to registrant when more info requested
+  rejectionReason          String?
+  
+  // Timestamps
+  submittedAt              DateTime?        @default(now())
+  reviewedAt               DateTime?
+  approvedAt               DateTime?
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+  
+  // Relations
+  contacts                 ForumContact[]
+  documents                ForumDocument[]
+  generatedDocs            GeneratedDocument[]
+  downloadLogs             DocumentDownloadLog[]
+  auditLogs                AuditLog[]
+}
+
+model ForumContact {
+  id          String   @id @default(uuid())
+  forumId     String
+  forum       Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  role        String   // "Coordinator", "Secretary", "Youth Leader", "Woman Leader"
+  fullName    String
+  phoneNumber String
+  email       String?
+  createdAt   DateTime @default(now())
+}
+
+model ForumDocument {
+  id               String   @id @default(uuid())
+  forumId          String
+  forum            Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  documentType     String   // "resolution_letter", "coordinator_passport", "supporting_doc"
+  filePath         String
+  originalFilename String
+  fileSizeBytes    Int
+  mimeType         String
+  uploadedAt       DateTime @default(now())
+}
+
+model GeneratedDocument {
+  id                String                @id @default(uuid())
+  forumId           String
+  forum             Forum                 @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  docType           String                // "certificate_of_registration", "letter_of_recognition"
+  verificationToken String                @unique
+  filePath          String
+  fileSizeBytes     Int                   @default(0)
+  downloadCount     Int                   @default(0)
+  isRevoked         Boolean               @default(false)
+  issuedAt          DateTime              @default(now())
+  downloadLogs      DocumentDownloadLog[]
+}
+
+model DocumentDownloadLog {
+  id             Int                @id @default(autoincrement())
+  generatedDocId String?
+  generatedDoc   GeneratedDocument? @relation(fields: [generatedDocId], references: [id], onDelete: SetNull)
+  forumId        String
+  forum          Forum              @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  ipAddress      String?
+  userAgent      String?
+  downloadedAt   DateTime           @default(now())
+}
+
+// 3. User & Administrative RBAC
+model Role {
+  id          String   @id // "super_admin", "state_admin", "verification_officer", "content_editor", "reporting_viewer"
+  name        String
+  description String?
+  users       User[]
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  fullName     String
+  phoneNumber  String?
+  roleId       String
+  role         Role        @relation(fields: [roleId], references: [id])
+  stateId      Int?
+  state        State?      @relation(fields: [stateId], references: [id])
+  isActive     Boolean     @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  newsPosts    NewsPost[]
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorEmail String?
+  action     String   // e.g. "SUBMITTED", "APPROVED", "REJECTED", "QUERY_SENT", "EXPORT_XLSX"
+  entity     String   // "Forum", "User", "Document", "CMS"
+  entityId   String
+  details    String?  // JSON formatted details
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+  forumId    String?
+  forum      Forum?   @relation(fields: [forumId], references: [id], onDelete: SetNull)
+}
+
+// 4. CMS Layer: Announcements, News, Events & Gallery
+model Announcement {
+  id             String    @id @default(uuid())
+  title          String
+  body           String
+  targetAudience String    @default("all") // "all", "registered_forums", "executives"
+  status         String    @default("published") // "draft", "published", "archived"
+  publishedAt    DateTime? @default(now())
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model NewsPost {
+  id               String    @id @default(uuid())
+  title            String
+  slug             String    @unique
+  excerpt          String?
+  body             String
+  featuredImageUrl String?
+  category         String    @default("General")
+  authorId         String?
+  author           User?     @relation(fields: [authorId], references: [id])
+  status           String    @default("published") // "draft", "published", "archived"
+  publishedAt      DateTime? @default(now())
+  createdAt        DateTime  @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  eventDate   DateTime
+  eventTime   String?
+  venue       String
+  lgaId       Int?
+  lga         Lga?     @relation(fields: [lgaId], references: [id])
+  imageUrl    String?
+  status      String   @default("published") // "draft", "published", "archived"
+  createdAt   DateTime @default(now())
+}
+
+model GalleryItem {
+  id        String   @id @default(uuid())
+  title     String
+  caption   String?
+  imageUrl  String
+  category  String   @default("Events")
+  createdAt DateTime @default(now())
+}
