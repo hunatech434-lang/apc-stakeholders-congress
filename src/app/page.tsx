@@ -19,7 +19,8 @@ import {
 import { prisma } from '@/lib/prisma';
 import HeroCarousel from '@/components/home/HeroCarousel';
 
-export const revalidate = 60; // Revalidate every 60s
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function HomePage() {
   // Fetch real statistics & recent verified groups

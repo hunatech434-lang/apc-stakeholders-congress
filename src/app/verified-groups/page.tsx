@@ -12,7 +12,8 @@ import {
   FileCheck2
 } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function VerifiedGroupsPage({
   searchParams,
@@ -41,16 +42,20 @@ export default async function VerifiedGroupsPage({
     where.areaOfCoverage = area;
   }
 
-  const verifiedForums = await prisma.forum.findMany({
-    where,
-    orderBy: { approvedAt: 'desc' },
-    include: { lga: true },
-  });
+  let verifiedForums: any[] = [];
+  let lgas: any[] = [];
+  try {
+    verifiedForums = await prisma.forum.findMany({
+      where,
+      orderBy: { approvedAt: 'desc' },
+      include: { lga: true },
+    });
 
-  const lgas = await prisma.lga.findMany({
-    where: { isActive: true },
-    orderBy: { name: 'asc' },
-  });
+    lgas = await prisma.lga.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+    });
+  } catch (e) {}
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 lg:py-20">

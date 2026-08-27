@@ -3,18 +3,23 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Newspaper, Calendar, ArrowRight, Bell, Tag } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function NewsPage() {
-  const news = await prisma.newsPost.findMany({
-    where: { status: 'published' },
-    orderBy: { createdAt: 'desc' },
-  });
+  let news: any[] = [];
+  let announcements: any[] = [];
+  try {
+    news = await prisma.newsPost.findMany({
+      where: { status: 'published' },
+      orderBy: { createdAt: 'desc' },
+    });
 
-  const announcements = await prisma.announcement.findMany({
-    where: { status: 'published' },
-    orderBy: { createdAt: 'desc' },
-  });
+    announcements = await prisma.announcement.findMany({
+      where: { status: 'published' },
+      orderBy: { createdAt: 'desc' },
+    });
+  } catch (e) {}
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
@@ -36,7 +41,7 @@ export default async function NewsPage() {
         {announcements.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-gold-600" />
+              <Bell className="w-5 h-5 text-sky-600" />
               Latest Announcements
             </h2>
 
