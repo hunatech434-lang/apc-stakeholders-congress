@@ -6,7 +6,7 @@ export function normalizeNigerianPhone(phone: string): { isValid: boolean; forma
   if (!phone) return { isValid: false, formatted: '', raw: '' };
 
   // Remove spaces, dashes, parentheses
-  let cleaned = phone.replace(/[\s\-\(\)\.]/g, '');
+  let cleaned = phone.trim().replace(/[\s\-\(\)\.]/g, '');
 
   if (cleaned.startsWith('+234')) {
     cleaned = '0' + cleaned.slice(4);
@@ -16,9 +16,8 @@ export function normalizeNigerianPhone(phone: string): { isValid: boolean; forma
     cleaned = '0' + cleaned;
   }
 
-  // A standard Nigerian phone number starts with 0 and has 11 digits
-  // Prefixes: 070, 080, 081, 090, 091, etc.
-  const isValid = /^0(70|80|81|90|91|71|82)\d{8}$/.test(cleaned);
+  // A standard Nigerian mobile/landline number starts with 0 and has 11 digits
+  const isValid = /^0\d{10}$/.test(cleaned);
 
   return {
     isValid,

@@ -14,7 +14,10 @@ import {
   TrendingUp,
   Landmark,
   Building,
-  Sparkles
+  Sparkles,
+  Target,
+  Layers,
+  Vote
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import HeroCarousel from '@/components/home/HeroCarousel';
@@ -52,15 +55,6 @@ export default async function HomePage() {
       orderBy: { createdAt: 'desc' },
     });
   } catch (e) {}
-
-  const coreValues = [
-    { title: 'Unity', desc: 'Bringing diverse support groups and stakeholder forums under one purposeful umbrella.' },
-    { title: 'Loyalty', desc: 'Unwavering allegiance to the All Progressives Congress and its leadership structure.' },
-    { title: 'Service', desc: 'Selfless civic commitment to community development and party progress.' },
-    { title: 'Integrity', desc: 'Transparent, accountable, and disciplined grassroots political operations.' },
-    { title: 'Grassroots First', desc: 'Empowering local polling units, wards, and communities where real victory lives.' },
-    { title: 'Party Supremacy', desc: 'Strict alignment with the constitution, guidelines, and directives of the APC.' },
-  ];
 
   const lgasByDistrict = [
     {
@@ -120,37 +114,56 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. WHO WE ARE & PURPOSE */}
+      {/* 3. WHO WE ARE & PURPOSE (EXACT APPROVED FRAMING) */}
       <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            <div className="lg:col-span-6 space-y-5 sm:space-y-6">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-800 text-xs font-bold uppercase tracking-wider rounded border border-brand-200">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-apcRed-500"></span>
-                Institutional Mandate
+                Official Mandate
               </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                One Platform, One Purpose, One Indomitable Party
-              </h2>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                The <strong>APC Stakeholders Congress</strong> operates as the premier organizing, harmonizing, and coordinating body for all All Progressives Congress support groups, professional bodies, youth and women associations across Kwara State.
-              </p>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                Our objective is to transition from uncoordinated political interest groups to a structured, synchronized grassroots machinery that commands presence in every polling unit, ward, and Local Government Area in preparation for the 2027 general elections.
-              </p>
               
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                About APC Stakeholders Congress, Kwara State
+              </h2>
+
+              <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
+                <p>
+                  The <strong className="text-slate-900 font-bold">APC Stakeholders Congress</strong> serves as the premier platform for organizing, harmonizing, and coordinating the various support groups, professional associations, youth and women organizations, and other stakeholders within the <strong className="text-brand-800 font-bold">All Progressives Congress (APC) across Kwara State</strong>.
+                </p>
+
+                <p>
+                  Our mission is to transform the existing network of political interest groups into a <strong className="text-slate-900 font-bold">unified, structured, and effective grassroots political machinery</strong>. By fostering collaboration, communication, and strategic coordination among stakeholders, we seek to build a stronger and more cohesive APC presence across the state.
+                </p>
+
+                <p>
+                  Our structure is designed to establish active and functional engagement at <strong className="text-slate-900 font-bold">every Local Government Area, ward, and polling unit</strong>, ensuring that every stakeholder and grassroots supporter has a meaningful role to play in advancing the party's objectives.
+                </p>
+
+                <p>
+                  As we work towards the <strong className="text-brand-800 font-bold">2027 General Elections</strong>, the APC Stakeholders Congress remains committed to strengthening grassroots mobilization, promoting unity among party stakeholders, coordinating support groups, and building a sustainable political network capable of delivering electoral success for the APC in Kwara State.
+                </p>
+              </div>
+
+              <div className="pt-2 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <p className="text-xs sm:text-sm font-extrabold text-brand-800 tracking-wide text-center">
+                  One Party. One Structure. One Strong Grassroots Movement.
+                </p>
+              </div>
+
               <div className="pt-1">
                 <Link
                   href="/about"
                   className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-brand-700 hover:text-brand-800 group"
                 >
-                  <span>Learn more about our Vision, Mission & Structure</span>
+                  <span>Learn more about our Vision & Leadership Structure</span>
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-apcRed-500" />
                 </Link>
               </div>
             </div>
 
-            <div className="lg:col-span-6 bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
+            <div className="lg:col-span-5 bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 border-b border-slate-200 pb-3">
                 Why Register Your Forum?
               </h3>
@@ -161,8 +174,8 @@ export default async function HomePage() {
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Official Letter & Certificate of Recognition</h4>
-                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Receive digitally signed accreditation documents verified by the State Directorate.</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Official Letter of Recognition</h4>
+                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Receive an official letterhead document verified by the State Directorate.</p>
                   </div>
                 </div>
 
@@ -182,7 +195,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-slate-900">Capacity Building & Strategic Coordination</h4>
-                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Access voter education manuals, campaign training sessions, and strategic mobilization tools.</p>
+                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Access voter education manuals, campaign workshops, and strategic mobilization tools.</p>
                   </div>
                 </div>
               </div>
@@ -200,37 +213,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. CORE VALUES SECTION */}
-      <section className="py-14 sm:py-20 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-400">Guiding Ideals</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">Our Core Values</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1.5">
-              The fundamental institutional tenets underpinning every forum, coordinator, and grassroots stakeholder.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {coreValues.map((val, idx) => (
-              <div
-                key={val.title}
-                className="p-5 sm:p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 hover:border-brand-500/50 transition relative overflow-hidden group"
-              >
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-xs font-bold text-sky-400">0{idx + 1}</span>
-                  <Sparkles className="w-3.5 h-3.5 text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <h3 className="text-base font-bold text-white mb-1.5">{val.title}</h3>
-                <p className="text-xs text-slate-300 leading-relaxed">{val.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. GEOGRAPHIC COVERAGE (16 LGAs OF KWARA) */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      {/* 4. GEOGRAPHIC COVERAGE (16 LGAs OF KWARA) */}
+      <section className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Jurisdiction & Scope</span>
@@ -274,7 +258,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. VERIFIED GROUPS PREVIEW */}
+      {/* 5. VERIFIED GROUPS PREVIEW */}
       <section className="py-14 sm:py-20 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-3">
@@ -341,7 +325,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. LATEST ANNOUNCEMENTS & NEWS */}
+      {/* 6. LATEST ANNOUNCEMENTS & NEWS */}
       {announcements.length > 0 && (
         <section className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -371,14 +355,14 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 8. CALL TO ACTION STRIP */}
+      {/* 7. CALL TO ACTION STRIP */}
       <section className="py-14 sm:py-20 bg-gradient-to-br from-brand-900 via-slate-950 to-brand-950 text-white border-t-2 border-apcRed-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-6">
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Ready to Accredit Your APC Support Group?
           </h2>
           <p className="text-brand-100 text-xs sm:text-base max-w-2xl mx-auto">
-            Take 5 minutes to complete the official digital registration. Capture your leadership, operating areas, and mobilization capacity for official recognition.
+            Take 3 minutes to complete the official digital registration. Obtain official recognition and mobilize with the party for victory in 2027.
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link

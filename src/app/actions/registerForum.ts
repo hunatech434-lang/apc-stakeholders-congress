@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { generateRegistrationRef, generateVerificationToken } from '@/lib/refGenerator';
 import { fullRegistrationSchema, FullRegistrationInput } from '@/lib/validators';
 import { logAudit } from '@/lib/auditLogger';
-import { generateCertificatePdf, generateLetterOfRecognitionPdf } from '@/lib/documentGenerator';
+import { generateLetterOfRecognitionPdf } from '@/lib/documentGenerator';
 import { sendRegistrationDocumentsEmail } from '@/lib/emailService';
 import fs from 'fs';
 import path from 'path';
@@ -13,7 +13,6 @@ export interface RegistrationResult {
   success: boolean;
   registrationRef?: string;
   forumId?: string;
-  certDocId?: string;
   letterDocId?: string;
   error?: string;
   fieldErrors?: Record<string, string[]>;
@@ -34,7 +33,7 @@ export async function submitForumRegistration(
       });
       return {
         success: false,
-        error: 'Validation failed. Please review the highlighted fields.',
+        error: 'Validation failed. Please review the highlighted fields in the form.',
         fieldErrors,
       };
     }
@@ -55,7 +54,7 @@ export async function submitForumRegistration(
       if (existing.name.toLowerCase() === validData.name.trim().toLowerCase()) {
         return {
           success: false,
-          error: `A forum with the name "${validData.name}" has already been registered. If you are the coordinator, please check your registration status on the portal.`,
+          error: `A forum with the name "${validData.name}" has already been registered. If you are the coordinator, you can check your registration status on the portal.`,
         };
       }
       if (existing.coordinatorPhone === validData.coordinatorPhone.trim()) {
@@ -66,20 +65,40 @@ export async function submitForumRegistration(
       }
     }
 
-    // 3. Find Kwara state
-    const state = await prisma.state.findFirst({ where: { code: 'KW' } });
+    // 3. Find or Auto-seed Kwara state reference
+    let state = await prisma.state.findFirst({ where: { code: 'KW' } });
     if (!state) {
-      return { success: false, error: 'Kwara State reference data is missing. Please contact administration.' };
+      // Auto-heal reference record if unseeded
+      let zone = await prisma.geopoliticalZone.findFirst({ where: { code: 'NC' } });
+      if (!zone) {
+        let country = await prisma.country.findFirst({ where: { id: 'NGA' } });
+        if (!country) {
+          country = await prisma.country.create({ data: { id: 'NGA', name: 'Nigeria', isActive: true } });
+        }
+        zone = await prisma.geopoliticalZone.create({
+          data: { name: 'North Central', code: 'NC', countryId: country.id },
+        });
+      }
+      state = await prisma.state.create({
+        data: { name: 'Kwara', code: 'KW', zoneId: zone.id, isActive: true },
+      });
     }
 
     const primaryLgaId = validData.lgaId || (validData.selectedLgaIds && validData.selectedLgaIds[0]) || 1;
-    const lga = await prisma.lga.findUnique({
+    let lga = await prisma.lga.findUnique({
       where: { id: primaryLgaId },
       include: { senatorialDistrict: true },
     });
 
     if (!lga) {
-      return { success: false, error: 'Selected Local Government Area is invalid.' };
+      // Fallback find any LGA in state or create default
+      lga = await prisma.lga.findFirst({ where: { stateId: state.id }, include: { senatorialDistrict: true } });
+      if (!lga) {
+        lga = await prisma.lga.create({
+          data: { name: 'Ilorin South', code: 'KW-ILS', stateId: state.id, isActive: true },
+          include: { senatorialDistrict: true },
+        });
+      }
     }
 
     // 4. Generate unique registration reference
@@ -104,8 +123,8 @@ export async function submitForumRegistration(
           yearEstablished: validData.yearEstablished,
           areaOfCoverage: validData.areaOfCoverage,
           stateId: state.id,
-          senatorialDistrictId: lga.senatorialDistrictId || null,
-          lgaId: primaryLgaId,
+          senatorialDistrictId: lga?.senatorialDistrictId || null,
+          lgaId: lga?.id || primaryLgaId,
           wardId: validData.wardId || null,
           wardName: formattedWard || null,
           officeAddress: validData.officeAddress.trim(),
@@ -177,7 +196,7 @@ export async function submitForumRegistration(
       return createdForum;
     });
 
-    // 6. IMMEDIATELY GENERATE ACCREDITATION DOCUMENTS (Certificate + Letter)
+    // 6. GENERATE OFFICIAL LETTER OF RECOGNITION / ACCEPTANCE PDF
     const storageDir = path.join(process.cwd(), 'storage', 'generated');
     if (!fs.existsSync(storageDir)) {
       fs.mkdirSync(storageDir, { recursive: true });
@@ -187,7 +206,7 @@ export async function submitForumRegistration(
       id: forum.id,
       name: forum.name,
       registrationRef: forum.registrationRef,
-      lgaName: lga.name,
+      lgaName: lga?.name || 'Kwara State',
       areaOfCoverage: forum.areaOfCoverage,
       stateName: 'Kwara State',
       yearEstablished: forum.yearEstablished,
@@ -195,25 +214,6 @@ export async function submitForumRegistration(
       coordinatorName: forum.coordinatorName,
     };
 
-    // A. Generate Certificate
-    const certToken = generateVerificationToken();
-    const certBuffer = await generateCertificatePdf(docForumData, certToken);
-    const certFilename = `cert_${forum.id}_${Date.now()}.pdf`;
-    const certFilePath = path.join(storageDir, certFilename);
-    fs.writeFileSync(certFilePath, certBuffer);
-
-    const certDoc = await prisma.generatedDocument.create({
-      data: {
-        forumId: forum.id,
-        docType: 'certificate_of_registration',
-        verificationToken: certToken,
-        filePath: `/storage/generated/${certFilename}`,
-        fileSizeBytes: certBuffer.length,
-        issuedAt: now,
-      },
-    });
-
-    // B. Generate Letter of Recognition
     const letterToken = generateVerificationToken();
     const letterBuffer = await generateLetterOfRecognitionPdf(docForumData, letterToken);
     const letterFilename = `letter_${forum.id}_${Date.now()}.pdf`;
@@ -231,7 +231,7 @@ export async function submitForumRegistration(
       },
     });
 
-    // 7. DISPATCH SMTP EMAIL WITH PDF ATTACHMENTS (Asynchronous / Non-blocking)
+    // 7. DISPATCH SMTP EMAIL WITH LETTER OF RECOGNITION PDF ATTACHMENT (Non-blocking)
     const recipientEmail = validData.coordinatorEmail || validData.forumEmail;
     if (recipientEmail) {
       sendRegistrationDocumentsEmail({
@@ -240,8 +240,7 @@ export async function submitForumRegistration(
         forumName: forum.name,
         registrationRef: forum.registrationRef,
         areaOfCoverage: forum.areaOfCoverage,
-        lgaName: lga.name,
-        certificatePdfBuffer: certBuffer,
+        lgaName: lga?.name || 'Kwara State',
         letterPdfBuffer: letterBuffer,
       }).catch((err) => console.error('Background email dispatch error:', err));
     }
@@ -255,10 +254,9 @@ export async function submitForumRegistration(
       details: {
         registrationRef: forum.registrationRef,
         forumName: forum.name,
-        lga: lga.name,
+        lga: lga?.name || 'Kwara State',
         areaOfCoverage: validData.areaOfCoverage,
         declaredStrength: forum.totalStrength,
-        certDocId: certDoc.id,
         letterDocId: letterDoc.id,
       },
     });
@@ -267,14 +265,13 @@ export async function submitForumRegistration(
       success: true,
       registrationRef: forum.registrationRef,
       forumId: forum.id,
-      certDocId: certDoc.id,
       letterDocId: letterDoc.id,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration submission error:', error);
     return {
       success: false,
-      error: 'A server error occurred while processing your registration. Please try again or contact support.',
+      error: error?.message || 'A server error occurred while processing your registration. Please try again or contact support.',
     };
   }
 }

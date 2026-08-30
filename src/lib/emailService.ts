@@ -126,15 +126,24 @@ export async function sendRegistrationDocumentsEmail(params: SendRegistrationDoc
               <td className="label">Jurisdiction / Scope:</td>
               <td className="value">${params.lgaName} • ${params.areaOfCoverage}</td>
             </tr>
-            <tr>
-              <td className="label">Accreditation Status:</td>
-              <td className="value" style="color: #008751;">Approved & Verified ✓</td>
-            </tr>
           </table>
 
-          <p style="margin-top: 20px;">
-            Your official vector <strong>Certificate of Registration</strong> and signed <strong>Letter of Recognition</strong> have been attached to this email as PDF files. You can also view or re-download your documents anytime from the official portal.
-          </p>
+            <p style="margin: 0 0 16px 0;">
+              Your forum details and declared grassroots strength have been officially cataloged in the State Directorate registry. Attached to this email is your official <strong>Letter of Recognition (PDF)</strong>.
+            </p>
+
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px; margin: 20px 0; text-align: center;">
+              <p style="margin: 0 0 4px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #166534; font-weight: bold;">
+                Official Registration Reference
+              </p>
+              <p style="margin: 0; font-size: 20px; font-weight: 800; font-family: monospace; color: #008751;">
+                ${params.registrationRef}
+              </p>
+            </div>
+
+            <p style="margin: 0 0 16px 0; font-size: 13px; color: #475569;">
+              <strong>Note:</strong> Official Certificates of Registration will be presented physically at the upcoming State Stakeholders Convention / Secretariat.
+            </p>
 
           <div className="btn-container">
             <a href="${appUrl}/status?ref=${params.registrationRef}" className="btn">View Online Portal Status</a>

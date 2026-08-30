@@ -259,47 +259,36 @@ export default async function StatusPage({
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-brand-600" />
-                  Official Accreditation Documents Ready
+                  Official Accreditation Document
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {certDoc && (
+                <div className="grid grid-cols-1 gap-4">
+                  {letterDoc ? (
                     <a
-                      href={`/api/documents/${certDoc.id}/download`}
+                      href={`/api/documents/${letterDoc.id}/download`}
                       className="p-4 rounded-2xl bg-brand-50 border border-brand-200 hover:border-brand-500 hover:shadow-md transition flex items-center justify-between group"
                     >
                       <div>
                         <div className="font-bold text-brand-950 text-xs sm:text-sm">
-                          Certificate of Registration
+                          Official Letter of Recognition / Acceptance
                         </div>
                         <div className="text-[11px] text-brand-700 mt-0.5">
-                          High-Resolution Vector PDF
+                          Official Letterhead Signed PDF
                         </div>
                       </div>
                       <div className="p-2.5 bg-brand-600 group-hover:bg-brand-500 text-white rounded-xl transition">
                         <FileDown className="w-5 h-5" />
                       </div>
                     </a>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                      Official Letter of Recognition is being prepared by the Directorate.
+                    </div>
                   )}
+                </div>
 
-                  {letterDoc && (
-                    <a
-                      href={`/api/documents/${letterDoc.id}/download`}
-                      className="p-4 rounded-2xl bg-sky-50 border border-sky-200 hover:border-sky-500 hover:shadow-md transition flex items-center justify-between group"
-                    >
-                      <div>
-                        <div className="font-bold text-sky-950 text-xs sm:text-sm">
-                          Letter of Recognition
-                        </div>
-                        <div className="text-[11px] text-sky-700 mt-0.5">
-                          Official Letterhead PDF
-                        </div>
-                      </div>
-                      <div className="p-2.5 bg-sky-500 group-hover:bg-sky-400 text-white rounded-xl transition">
-                        <FileDown className="w-5 h-5" />
-                      </div>
-                    </a>
-                  )}
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600">
+                  <strong>Physical Certificate Presentation:</strong> Official Certificates of Registration will be presented physically at the upcoming State Stakeholders Convention / Secretariat.
                 </div>
               </div>
             )}
