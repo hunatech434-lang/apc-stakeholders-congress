@@ -20,7 +20,7 @@ export default function RegisterPage() {
             Forum & Support Group Registration
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Complete the 10-step form to register your association under the APC Stakeholders Congress (Kwara State Chapter).
+            Complete the 2-section form to register and accredit your association under the APC Stakeholders Congress (Kwara State Chapter).
           </p>
         </div>
 
