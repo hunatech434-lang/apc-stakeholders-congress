@@ -105,11 +105,7 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
     officeAddress: forum.officeAddress,
   };
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const genDir = path.join(process.cwd(), 'storage', 'generated');
-  if (!fs.existsSync(genDir)) {
-    fs.mkdirSync(genDir, { recursive: true });
-  }
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://apc-stakeholders-congress.vercel.app';
 
   // Official Letter of Recognition
   let letterDoc = await prisma.generatedDocument.findFirst({
@@ -118,10 +114,26 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
 
   if (!letterDoc) {
     const letterToken = generateVerificationToken();
-    const letterBuffer = await generateLetterOfRecognitionPdf(forumData, letterToken, appUrl);
+    let letterBuffer: Buffer | null = null;
+    try {
+      letterBuffer = await generateLetterOfRecognitionPdf(forumData, letterToken, appUrl);
+    } catch (pdfErr) {
+      console.error('Error generating PDF letter in memory:', pdfErr);
+    }
     const letterFileName = `letter_${forum.registrationRef.replace(/[^a-zA-Z0-9]/g, '_')}_${letterToken.slice(0, 8)}.pdf`;
-    const letterFilePath = path.join(genDir, letterFileName);
-    fs.writeFileSync(letterFilePath, letterBuffer);
+
+    try {
+      const os = await import('os');
+      const genDir = path.join(os.tmpdir(), 'storage', 'generated');
+      if (!fs.existsSync(genDir)) {
+        fs.mkdirSync(genDir, { recursive: true });
+      }
+      if (letterBuffer) {
+        fs.writeFileSync(path.join(genDir, letterFileName), letterBuffer);
+      }
+    } catch (fsErr) {
+      console.warn('Temporary file write skipped in serverless environment:', fsErr);
+    }
 
     letterDoc = await prisma.generatedDocument.create({
       data: {
@@ -129,7 +141,7 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
         docType: 'letter_of_recognition',
         verificationToken: letterToken,
         filePath: `/storage/generated/${letterFileName}`,
-        fileSizeBytes: letterBuffer.length,
+        fileSizeBytes: letterBuffer ? letterBuffer.length : 0,
       },
     });
   }

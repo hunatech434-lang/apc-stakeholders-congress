@@ -194,11 +194,6 @@ export async function submitForumRegistration(
     });
 
     // 6. GENERATE OFFICIAL LETTER OF RECOGNITION PDF
-    const storageDir = path.join(process.cwd(), 'storage', 'generated');
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
-    }
-
     const docForumData = {
       id: forum.id,
       name: forum.name,
@@ -213,10 +208,28 @@ export async function submitForumRegistration(
     };
 
     const letterToken = generateVerificationToken();
-    const letterBuffer = await generateLetterOfRecognitionPdf(docForumData, letterToken);
+    let letterBuffer: Buffer | null = null;
+    try {
+      letterBuffer = await generateLetterOfRecognitionPdf(docForumData, letterToken);
+    } catch (pdfErr) {
+      console.error('Error generating PDF letter in memory:', pdfErr);
+    }
+
     const letterFilename = `letter_${forum.id}_${Date.now()}.pdf`;
-    const letterFilePath = path.join(storageDir, letterFilename);
-    fs.writeFileSync(letterFilePath, letterBuffer);
+
+    // Optional cache in temporary storage directory (serverless safe)
+    try {
+      const os = await import('os');
+      const tmpStorageDir = path.join(os.tmpdir(), 'storage', 'generated');
+      if (!fs.existsSync(tmpStorageDir)) {
+        fs.mkdirSync(tmpStorageDir, { recursive: true });
+      }
+      if (letterBuffer) {
+        fs.writeFileSync(path.join(tmpStorageDir, letterFilename), letterBuffer);
+      }
+    } catch (fsErr) {
+      console.warn('File cache write skipped in read-only environment:', fsErr);
+    }
 
     const letterDoc = await prisma.generatedDocument.create({
       data: {
@@ -224,7 +237,7 @@ export async function submitForumRegistration(
         docType: 'letter_of_recognition',
         verificationToken: letterToken,
         filePath: `/storage/generated/${letterFilename}`,
-        fileSizeBytes: letterBuffer.length,
+        fileSizeBytes: letterBuffer ? letterBuffer.length : 0,
         issuedAt: now,
       },
     });
@@ -239,7 +252,7 @@ export async function submitForumRegistration(
         registrationRef: forum.registrationRef,
         areaOfCoverage: forum.areaOfCoverage,
         lgaName: lga?.name || 'Kwara State',
-        letterPdfBuffer: letterBuffer,
+        letterPdfBuffer: letterBuffer || undefined,
       }).catch((err) => console.error('Background email dispatch error:', err));
     }
 
