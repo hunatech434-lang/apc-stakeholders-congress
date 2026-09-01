@@ -1,45 +1,37 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { 
   Building2, 
   MapPin, 
   Users, 
   Layers, 
   Vote, 
-  ShieldCheck, 
-  HelpCircle, 
+  FileText, 
   CheckCircle2, 
-  ArrowLeft, 
-  ArrowRight, 
   AlertCircle, 
-  MessageCircle,
-  ExternalLink,
-  ChevronDown,
-  FileDown,
-  FileText,
-  Check
+  ArrowRight, 
+  ArrowLeft, 
+  Download, 
+  ExternalLink, 
+  ShieldCheck, 
+  Check, 
+  Sparkles, 
+  ChevronDown 
 } from 'lucide-react';
-import { submitForumRegistration, RegistrationResult } from '@/app/actions/registerForum';
+import { registerForumAction, RegistrationResult } from '@/app/actions/registerForum';
+import { section1Schema, section2Schema } from '@/lib/validators';
 
-// The 16 Local Government Areas of Kwara State grouped by Senatorial District
 const KWARA_LGAS = [
-  // Kwara Central
   { id: 1, name: 'Asa', district: 'Kwara Central' },
   { id: 2, name: 'Ilorin East', district: 'Kwara Central' },
   { id: 3, name: 'Ilorin South', district: 'Kwara Central' },
   { id: 4, name: 'Ilorin West', district: 'Kwara Central' },
-
-  // Kwara North
   { id: 5, name: 'Baruten', district: 'Kwara North' },
   { id: 6, name: 'Edu', district: 'Kwara North' },
   { id: 7, name: 'Kaiama', district: 'Kwara North' },
   { id: 8, name: 'Moro', district: 'Kwara North' },
   { id: 9, name: 'Pategi', district: 'Kwara North' },
-
-  // Kwara South
   { id: 10, name: 'Ekiti', district: 'Kwara South' },
   { id: 11, name: 'Ifelodun', district: 'Kwara South' },
   { id: 12, name: 'Irepodun', district: 'Kwara South' },
@@ -85,9 +77,6 @@ const COVERAGE_OPTIONS = [
 ];
 
 export default function RegistrationWizard() {
-  // Step 1: Section 1 (Identity, Geography & Leadership)
-  // Step 2: Section 2 (Capacity, Political Track Record & Commitments)
-  // Step 3: Success Screen (Accreditation & Letter of Recognition)
   const [currentStep, setCurrentStep] = useState(1);
   const [lgas, setLgas] = useState(KWARA_LGAS);
   const [submitting, setSubmitting] = useState(false);
@@ -97,7 +86,6 @@ export default function RegistrationWizard() {
   const [formData, setFormData] = useState({
     // Section 1: Forum Details & Geography
     name: '',
-    motto: '',
     yearEstablished: 2023,
     areaOfCoverage: 'Kwara State at Large',
     selectedCoverages: ['Kwara State at Large'] as string[],
@@ -123,8 +111,6 @@ export default function RegistrationWizard() {
     strengthRange: '100 - 200',
     keyActivities: ['Voter Mobilization', 'Sensitization / Awareness'] as string[],
     otherActivity: '',
-    hasWhatsappGroup: true,
-    whatsappGroupLink: '',
     additionalCapacityInfo: '',
 
     // Section 2: Political Track Record
@@ -141,11 +127,6 @@ export default function RegistrationWizard() {
     // Section 2: Support & Meetings
     supportNeeded: ['Branded Campaign Materials (T-shirts, Caps, Banners)', 'Training & Canvassing Workshops'] as string[],
     willingAttendMeetings: 'Yes' as 'Yes' | 'No' | 'Maybe',
-
-    // Section 2: Optional Documents
-    coordinatorPassportUrl: '',
-    resolutionLetterUrl: '',
-    supportingDocumentUrl: '',
   });
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -159,9 +140,7 @@ export default function RegistrationWizard() {
         if (data.lgas && data.lgas.length > 0) {
           setLgas(data.lgas);
         }
-      } catch (err) {
-        // Fallback KWARA_LGAS already loaded
-      }
+      } catch (err) {}
     }
     loadLgas();
   }, []);
@@ -169,7 +148,7 @@ export default function RegistrationWizard() {
   // 2. Draft Auto-Save to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('apc_forum_reg_draft_v4');
+      const saved = localStorage.getItem('apc_forum_reg_draft_v5');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -183,63 +162,50 @@ export default function RegistrationWizard() {
     setFormData((prev) => {
       const updated = { ...prev, ...fields };
       if (typeof window !== 'undefined') {
-        localStorage.setItem('apc_forum_reg_draft_v4', JSON.stringify(updated));
+        localStorage.setItem('apc_forum_reg_draft_v5', JSON.stringify(updated));
       }
       return updated;
     });
-
-    // Clear matching validation errors when typing
-    const updatedKeys = Object.keys(fields);
-    setValidationErrors((prev) => {
-      const next = { ...prev };
-      updatedKeys.forEach((k) => delete next[k]);
-      return next;
-    });
   };
 
-  // Toggle LGA Checkbox
-  const handleLgaToggle = (lgaId: number) => {
-    let current = [...formData.selectedLgaIds];
-    if (current.includes(lgaId)) {
-      current = current.filter((id) => id !== lgaId);
+  const handleLgaToggle = (id: number) => {
+    const current = [...formData.selectedLgaIds];
+    const idx = current.indexOf(id);
+    if (idx > -1) {
+      if (current.length > 1) {
+        current.splice(idx, 1);
+      }
     } else {
-      current.push(lgaId);
+      current.push(id);
     }
-
-    if (current.length === 0 && lgas.length > 0) {
-      current = [lgas[0].id];
-    }
-
     updateFormData({
       selectedLgaIds: current,
       lgaId: current[0] || 1,
-      isAllLgas: current.length === lgas.length && lgas.length > 0,
+      isAllLgas: current.length === lgas.length,
     });
   };
 
-  // Select All 16 LGAs Toggle
-  const handleAllLgasToggle = (checked: boolean) => {
-    if (checked) {
-      const allIds = lgas.map((l) => l.id);
+  const handleSelectAllLgas = () => {
+    if (formData.isAllLgas) {
       updateFormData({
-        selectedLgaIds: allIds,
-        lgaId: allIds[0] || 1,
-        isAllLgas: true,
+        isAllLgas: false,
+        selectedLgaIds: [1],
+        lgaId: 1,
       });
     } else {
-      const firstId = lgas[0]?.id || 1;
       updateFormData({
-        selectedLgaIds: [firstId],
-        lgaId: firstId,
-        isAllLgas: false,
+        isAllLgas: true,
+        selectedLgaIds: lgas.map((l) => l.id),
+        lgaId: 1,
       });
     }
   };
 
   const handleActivityToggle = (act: string) => {
-    let current = [...formData.keyActivities];
-    if (current.includes(act)) {
-      current = current.filter((a) => a !== act);
+    const current = [...formData.keyActivities];
+    const idx = current.indexOf(act);
+    if (idx > -1) {
+      if (current.length > 1) current.splice(idx, 1);
     } else {
       current.push(act);
     }
@@ -247,249 +213,188 @@ export default function RegistrationWizard() {
   };
 
   const handleSupportToggle = (sup: string) => {
-    let current = [...formData.supportNeeded];
-    if (current.includes(sup)) {
-      current = current.filter((s) => s !== sup);
+    const current = [...formData.supportNeeded];
+    const idx = current.indexOf(sup);
+    if (idx > -1) {
+      current.splice(idx, 1);
     } else {
       current.push(sup);
     }
     updateFormData({ supportNeeded: current });
   };
 
-  // Section 1 Validation
-  const validateSection1 = (): boolean => {
-    const errors: Record<string, string> = {};
+  // Step 1 -> Step 2 Validation
+  const handleProceedToStep2 = () => {
+    setValidationErrors({});
+    const result = section1Schema.safeParse(formData);
 
-    if (!formData.name.trim() || formData.name.trim().length < 2) {
-      errors.name = 'Forum name must be at least 2 characters.';
-    }
-    if (!formData.yearEstablished || formData.yearEstablished < 1960 || formData.yearEstablished > 2026) {
-      errors.yearEstablished = 'Please enter a valid founding year (1960 - 2026).';
-    }
-    if (formData.selectedLgaIds.length === 0) {
-      errors.lgaId = 'Please select at least one LGA of operation.';
-    }
-    if (!formData.officeAddress.trim() || formData.officeAddress.trim().length < 3) {
-      errors.officeAddress = 'Please enter an office or secretariat address.';
-    }
-    if (!formData.coordinatorName.trim()) {
-      errors.coordinatorName = 'Coordinator full name is required.';
-    }
-    if (!formData.coordinatorPhone.trim()) {
-      errors.coordinatorPhone = 'Coordinator phone number is required.';
-    }
-    if (!formData.secretaryName.trim()) {
-      errors.secretaryName = 'Secretary full name is required.';
-    }
-    if (!formData.secretaryPhone.trim()) {
-      errors.secretaryPhone = 'Secretary phone number is required.';
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Section 2 Validation
-  const validateSection2 = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    if (!formData.totalStrength || formData.totalStrength < 1) {
-      errors.totalStrength = 'Please select estimated member strength.';
-    }
-    if (formData.keyActivities.length === 0) {
-      errors.keyActivities = 'Please select at least one key mobilization activity.';
-    }
-    if (!formData.commitWork2027) {
-      errors.commitWork2027 = 'You must commit to mobilizing for APC in 2027.';
-    }
-    if (!formData.agreeWithCongress) {
-      errors.agreeWithCongress = 'You must agree to align with APC Stakeholders Congress principles.';
-    }
-    if (!formData.declarationConfirmed) {
-      errors.declarationConfirmed = 'You must confirm the truthfulness of the provided information.';
-    }
-    if (!formData.consentDataProcessing) {
-      errors.consentDataProcessing = 'Consent to data processing is required.';
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleNextSection = () => {
-    if (validateSection1()) {
-      setCurrentStep(2);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
       window.scrollTo({ top: 150, behavior: 'smooth' });
+      return;
     }
-  };
 
-  const handlePrevSection = () => {
-    setCurrentStep(1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentStep(2);
+    window.scrollTo({ top: 100, behavior: 'smooth' });
   };
 
   // Final Form Submission
-  const handleSubmit = async () => {
-    if (!validateSection2()) {
-      window.scrollTo({ top: 250, behavior: 'smooth' });
+  const handleFinalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationErrors({});
+
+    const result = section2Schema.safeParse(formData);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        errors[field] = err.message;
+      });
+      setValidationErrors(errors);
+      window.scrollTo({ top: 150, behavior: 'smooth' });
       return;
     }
 
     setSubmitting(true);
-    setSubmitResult(null);
-
     try {
-      const res = await submitForumRegistration({
+      const submissionData = {
         ...formData,
-        totalStrength: Number(formData.totalStrength),
-        yearEstablished: Number(formData.yearEstablished),
-        lgaId: Number(formData.lgaId || 1),
-        wardId: formData.wardId ? Number(formData.wardId) : null,
-        selectedLgaIds: formData.selectedLgaIds.map((id) => Number(id)),
-        areaOfCoverage: formData.areaOfCoverage,
-        wardName: formData.isAllWards ? 'All Wards' : formData.wardName,
-      });
+        motto: '',
+        wardName: 'All Wards Covered',
+        isAllWards: true,
+        hasWhatsappGroup: false,
+        whatsappGroupLink: '',
+      };
 
+      const res = await registerForumAction(submissionData);
       setSubmitting(false);
-      setSubmitResult(res);
 
       if (res.success) {
-        localStorage.removeItem('apc_forum_reg_draft_v4');
-        setCurrentStep(3); // Show Success Screen
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (res.fieldErrors) {
-        const mapped: Record<string, string> = {};
-        Object.entries(res.fieldErrors).forEach(([k, v]) => {
-          mapped[k] = v[0];
-        });
-        setValidationErrors(mapped);
-        window.scrollTo({ top: 150, behavior: 'smooth' });
+        setSubmitResult(res);
+        setCurrentStep(3);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('apc_forum_reg_draft_v5');
+        }
+        window.scrollTo({ top: 50, behavior: 'smooth' });
+      } else {
+        if (res.fieldErrors) {
+          const flatErrors: Record<string, string> = {};
+          Object.keys(res.fieldErrors).forEach((k) => {
+            flatErrors[k] = res.fieldErrors![k][0];
+          });
+          setValidationErrors(flatErrors);
+        }
+        alert(res.error || 'A submission error occurred. Please check all fields and try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       setSubmitting(false);
-      setSubmitResult({
-        success: false,
-        error: 'Network connection or server timeout. Please try again.',
-      });
+      alert('Network or server error: ' + (err.message || 'Please verify internet connection.'));
     }
   };
 
-  const officialWhatsAppLink = 'https://chat.whatsapp.com/JykufBzH7AS3wTLIk8XQ8f?s=cl&p=a&mlu=4';
+  const whatsappGroupLink = 'https://chat.whatsapp.com/JykufBzH7AS3wTLIk8XQ8f?s=cl&p=a&mlu=4';
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-      {/* Top Accent Strip */}
-      <div className="h-1.5 w-full flex">
-        <div className="h-full bg-brand-600 flex-1"></div>
-        <div className="h-full bg-sky-400 w-24"></div>
-        <div className="h-full bg-apcRed-500 w-24"></div>
-      </div>
+    <div className="max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6">
+      {/* Step Indicator Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between relative">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-slate-200 w-full z-0"></div>
+          <div
+            className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-600 transition-all duration-300 z-0"
+            style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
+          ></div>
 
-      {/* Header & Section Progress Indicator */}
-      <div className="p-5 sm:p-7 bg-slate-50 border-b border-slate-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-brand-700">
-              Official Digital Accreditation Portal • Kwara State Chapter
-            </span>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">
-              APC Stakeholders & Support Group Registration
-            </h1>
-          </div>
-          {currentStep < 3 && (
-            <div className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-brand-800 shadow-sm w-fit">
-              Section {currentStep} of 2
+          {/* Step 1 Pill */}
+          <div className="relative z-10 flex flex-col items-center">
+            <div
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border-2 transition ${
+                currentStep >= 1
+                  ? 'bg-brand-600 border-brand-600 text-white shadow-md'
+                  : 'bg-white border-slate-300 text-slate-500'
+              }`}
+            >
+              1
             </div>
-          )}
-        </div>
-
-        {/* 2-Section Step Progress Bar */}
-        {currentStep < 3 && (
-          <div className="grid grid-cols-2 gap-3 max-w-xl">
-            <button
-              type="button"
-              onClick={() => setCurrentStep(1)}
-              className={`p-3 rounded-2xl border text-left transition flex items-center gap-3 ${
-                currentStep === 1
-                  ? 'bg-white border-brand-500 shadow-sm ring-2 ring-brand-500/20'
-                  : 'bg-white/60 border-slate-200 hover:bg-white'
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
-                currentStep === 1 ? 'bg-brand-600 text-white' : 'bg-emerald-100 text-emerald-700'
-              }`}>
-                {currentStep > 1 ? <Check className="w-4 h-4" /> : '1'}
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">Section 1</div>
-                <div className="text-[11px] text-slate-500 truncate">Identity & Leadership</div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (validateSection1()) setCurrentStep(2);
-              }}
-              className={`p-3 rounded-2xl border text-left transition flex items-center gap-3 ${
-                currentStep === 2
-                  ? 'bg-white border-brand-500 shadow-sm ring-2 ring-brand-500/20'
-                  : 'bg-white/60 border-slate-200 hover:bg-white'
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
-                currentStep === 2 ? 'bg-brand-600 text-white' : 'bg-slate-200 text-slate-600'
-              }`}>
-                2
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">Section 2</div>
-                <div className="text-[11px] text-slate-500 truncate">Capacity & Declarations</div>
-              </div>
-            </button>
+            <span className="text-[11px] sm:text-xs font-bold mt-1.5 text-slate-800 text-center">
+              Identity & Leadership
+            </span>
           </div>
-        )}
+
+          {/* Step 2 Pill */}
+          <div className="relative z-10 flex flex-col items-center">
+            <div
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border-2 transition ${
+                currentStep >= 2
+                  ? 'bg-brand-600 border-brand-600 text-white shadow-md'
+                  : 'bg-white border-slate-300 text-slate-500'
+              }`}
+            >
+              2
+            </div>
+            <span className="text-[11px] sm:text-xs font-bold mt-1.5 text-slate-800 text-center">
+              Capacity & Commitments
+            </span>
+          </div>
+
+          {/* Step 3 Pill */}
+          <div className="relative z-10 flex flex-col items-center">
+            <div
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border-2 transition ${
+                currentStep === 3
+                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-md ring-4 ring-emerald-100'
+                  : 'bg-white border-slate-300 text-slate-500'
+              }`}
+            >
+              3
+            </div>
+            <span className="text-[11px] sm:text-xs font-bold mt-1.5 text-slate-800 text-center">
+              Accreditation
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Global Error Banner */}
-      {submitResult && !submitResult.success && (
-        <div className="m-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-bold">Submission Error:</span>
-            <p>{submitResult.error}</p>
+      {/* ================= STEP 1: IDENTITY & LEADERSHIP ================= */}
+      {currentStep === 1 && (
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl space-y-8 animate-in fade-in duration-200">
+          <div className="border-b border-slate-100 pb-5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mb-2">
+              <Sparkles className="w-3.5 h-3.5" /> Official Kwara State Portal
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Section 1: Forum Identity, Operational Scope & Leadership
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Provide your group&apos;s legal/working title, operational Local Government Areas, and accredited leadership contacts.
+            </p>
           </div>
-        </div>
-      )}
 
-      {/* FORM BODY */}
-      <div className="p-6 sm:p-8 lg:p-10">
-        
-        {/* ================= SECTION 1: IDENTITY, GEOGRAPHY & LEADERSHIP ================= */}
-        {currentStep === 1 && (
-          <div className="space-y-10 max-w-4xl">
-            
+          <div className="space-y-8">
             {/* Part A: Forum Identity */}
             <div className="space-y-5">
               <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-brand-600" />
                 <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Part 1: Forum Identification & Basic Info
+                  Part 1: Basic Information & Jurisdiction
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Official Name of Forum / Support Group <span className="text-red-500">*</span>
+                    Forum Full Official Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => updateFormData({ name: e.target.value })}
-                    placeholder="e.g. Kwara APC Youth Vanguard for 2027"
+                    placeholder="e.g. Kwara APC Youth Mobilization Vanguard for 2027"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
                       validationErrors.name ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
                     }`}
@@ -518,32 +423,19 @@ export default function RegistrationWizard() {
                   )}
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Motto / Slogan (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.motto}
-                    onChange={(e) => updateFormData({ motto: e.target.value })}
-                    placeholder="e.g. Unity, Grassroots Loyalty & Victory"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     Primary Area of Coverage <span className="text-red-500">*</span>
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {COVERAGE_OPTIONS.map((opt) => (
                       <button
                         key={opt}
                         type="button"
                         onClick={() => updateFormData({ areaOfCoverage: opt })}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition text-center ${
+                        className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition text-center ${
                           formData.areaOfCoverage === opt
-                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-xs'
                             : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -568,31 +460,27 @@ export default function RegistrationWizard() {
                   <input
                     type="checkbox"
                     checked={formData.isAllLgas}
-                    onChange={(e) => handleAllLgasToggle(e.target.checked)}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300"
+                    onChange={handleSelectAllLgas}
+                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer"
                   />
                   <span>Select All 16 LGAs</span>
                 </label>
               </div>
 
-              {/* Primary LGA Dropdown */}
+              {/* Primary Base LGA Dropdown */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  Primary Local Government Area (LGA) <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Primary Base / Headquarter LGA <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <select
                     value={formData.lgaId}
                     onChange={(e) => {
                       const id = parseInt(e.target.value, 10);
-                      updateFormData({
-                        lgaId: id,
-                        selectedLgaIds: formData.selectedLgaIds.includes(id)
-                          ? formData.selectedLgaIds
-                          : [...formData.selectedLgaIds, id],
-                      });
+                      const currentSelected = Array.from(new Set([id, ...formData.selectedLgaIds]));
+                      updateFormData({ lgaId: id, selectedLgaIds: currentSelected });
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer pr-10"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none pr-10"
                   >
                     <optgroup label="Kwara Central">
                       {KWARA_LGAS.filter(l => l.district === 'Kwara Central').map(l => (
@@ -644,49 +532,23 @@ export default function RegistrationWizard() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-800">
-                      Ward / Polling Unit Focus
-                    </label>
-                    <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.isAllWards}
-                        onChange={(e) => updateFormData({ isAllWards: e.target.checked })}
-                        className="w-3.5 h-3.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300"
-                      />
-                      <span>All Wards in LGA(s)</span>
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    disabled={formData.isAllWards}
-                    value={formData.isAllWards ? 'All Wards Covered' : formData.wardName}
-                    onChange={(e) => updateFormData({ wardName: e.target.value })}
-                    placeholder="e.g. Akanbi Ward II / Balogun Fulani"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white disabled:bg-slate-100 disabled:text-slate-500 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Office / Secretariat Street Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.officeAddress}
-                    onChange={(e) => updateFormData({ officeAddress: e.target.value })}
-                    placeholder="e.g. Suite 4, Harmony Plaza, Fate Road, Ilorin"
-                    className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
-                      validationErrors.officeAddress ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
-                    }`}
-                  />
-                  {validationErrors.officeAddress && (
-                    <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.officeAddress}</p>
-                  )}
-                </div>
+              {/* Office Street Address */}
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Office / Secretariat Street Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.officeAddress}
+                  onChange={(e) => updateFormData({ officeAddress: e.target.value })}
+                  placeholder="e.g. Suite 4, Harmony Plaza, Fate Road, Ilorin, Kwara State"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
+                    validationErrors.officeAddress ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
+                  }`}
+                />
+                {validationErrors.officeAddress && (
+                  <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.officeAddress}</p>
+                )}
               </div>
             </div>
 
@@ -726,7 +588,7 @@ export default function RegistrationWizard() {
                     type="tel"
                     value={formData.coordinatorPhone}
                     onChange={(e) => updateFormData({ coordinatorPhone: e.target.value })}
-                    placeholder="e.g. 08032010479"
+                    placeholder="e.g. 08012345678"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
                       validationErrors.coordinatorPhone ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
                     }`}
@@ -744,7 +606,7 @@ export default function RegistrationWizard() {
                     type="text"
                     value={formData.secretaryName}
                     onChange={(e) => updateFormData({ secretaryName: e.target.value })}
-                    placeholder="e.g. Hajia Fatima Bello"
+                    placeholder="e.g. Comr. Aminat Babatunde"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
                       validationErrors.secretaryName ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
                     }`}
@@ -762,7 +624,7 @@ export default function RegistrationWizard() {
                     type="tel"
                     value={formData.secretaryPhone}
                     onChange={(e) => updateFormData({ secretaryPhone: e.target.value })}
-                    placeholder="e.g. 07030592380"
+                    placeholder="e.g. 07098765432"
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500 ${
                       validationErrors.secretaryPhone ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
                     }`}
@@ -780,7 +642,7 @@ export default function RegistrationWizard() {
                     type="email"
                     value={formData.forumEmail}
                     onChange={(e) => updateFormData({ forumEmail: e.target.value })}
-                    placeholder="e.g. youthvanguard@gmail.com"
+                    placeholder="e.g. info@forumname.org"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
@@ -793,273 +655,143 @@ export default function RegistrationWizard() {
                     type="text"
                     value={formData.socialMediaHandles}
                     onChange={(e) => updateFormData({ socialMediaHandles: e.target.value })}
-                    placeholder="e.g. Facebook: KwaraYouthVanguard | X: @KwaraAPC_Youth"
+                    placeholder="e.g. @KwaraYouthAPC (X/Facebook)"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Bottom Button */}
-            <div className="pt-6 border-t border-slate-200 flex items-center justify-end">
+            {/* Step 1 Actions */}
+            <div className="pt-6 border-t border-slate-100 flex items-center justify-end">
               <button
                 type="button"
-                onClick={handleNextSection}
-                className="px-8 py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow cursor-pointer"
+                onClick={handleProceedToStep2}
+                className="px-6 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-extrabold rounded-2xl text-xs sm:text-sm shadow-md transition flex items-center gap-2"
               >
-                <span>Continue to Section 2: Capacity & Declarations</span>
-                <ArrowRight className="w-4 h-4" />
+                Proceed to Section 2 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ================= SECTION 2: CAPACITY, TRACK RECORD & DECLARATIONS ================= */}
-        {currentStep === 2 && (
-          <div className="space-y-10 max-w-4xl">
-            
-            {/* Part D: Capacity & Key Activities */}
+      {/* ================= STEP 2: CAPACITY & COMMITMENTS ================= */}
+      {currentStep === 2 && (
+        <form onSubmit={handleFinalSubmit} className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl space-y-8 animate-in fade-in duration-200">
+          <div className="border-b border-slate-100 pb-5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mb-2">
+              <Sparkles className="w-3.5 h-3.5" /> Final Step
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Section 2: Mobilization Strength, Track Record & Commitments
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Declare your grassroots numerical strength, previous election activities, and affirmative commitments to the APC victory.
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            {/* Part A: Structure & Capacity */}
             <div className="space-y-5">
               <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
                 <Layers className="w-5 h-5 text-brand-600" />
                 <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Part 4: Mobilization Capacity & Activities
+                  Part 1: Structure & Mobilization Strength
                 </h2>
               </div>
 
-              <div className="space-y-5">
-                {/* Declared Member Strength Selector (Dual Dropdown + Interactive Option Pills) */}
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <label className="block text-xs font-bold text-slate-900">
-                      Declared Estimated Member Strength <span className="text-red-500">*</span>
-                    </label>
-                    <span className="text-[11px] text-brand-700 font-semibold">
-                      Selected: <strong>{formData.strengthRange || '100 - 200'}</strong> ({formData.totalStrength} est. count)
-                    </span>
-                  </div>
-
-                  {/* 1. Direct Clickable Option Cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-                    {MEMBER_STRENGTH_OPTIONS.map((opt) => {
-                      const isSelected = formData.strengthRange === opt.rangeStr;
-                      return (
-                        <button
-                          key={opt.rangeStr}
-                          type="button"
-                          onClick={() => {
-                            updateFormData({
-                              strengthRange: opt.rangeStr,
-                              totalStrength: opt.value,
-                            });
-                          }}
-                          className={`p-3 rounded-xl border text-xs font-bold transition text-center flex flex-col items-center justify-center gap-1 cursor-pointer ${
-                            isSelected
-                              ? 'bg-brand-600 text-white border-brand-600 shadow-md ring-2 ring-brand-500/20'
-                              : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100 hover:border-slate-400'
-                          }`}
-                        >
-                          <span className="text-sm font-extrabold">{opt.rangeStr}</span>
-                          <span className="text-[10px] font-medium opacity-85">Members</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* 2. Accessible Native Dropdown Selector */}
-                  <div className="relative pt-1">
-                    <select
-                      id="member-strength-select"
-                      aria-label="Declared Estimated Member Strength"
-                      value={formData.strengthRange}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        const selected = MEMBER_STRENGTH_OPTIONS.find(opt => opt.rangeStr === val);
-                        updateFormData({
-                          strengthRange: val,
-                          totalStrength: selected ? selected.value : 150,
-                        });
-                      }}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer pr-10 shadow-xs"
-                    >
-                      {MEMBER_STRENGTH_OPTIONS.map((opt) => (
-                        <option key={opt.rangeStr} value={opt.rangeStr}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 bottom-3 pointer-events-none" />
-                  </div>
-                  {validationErrors.totalStrength && (
-                    <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.totalStrength}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Internal WhatsApp Group Available?
-                    </label>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => updateFormData({ hasWhatsappGroup: true })}
-                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                          formData.hasWhatsappGroup
-                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
-                            : 'bg-slate-50 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        Yes, We Have a Group
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => updateFormData({ hasWhatsappGroup: false })}
-                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                          !formData.hasWhatsappGroup
-                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
-                            : 'bg-slate-50 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        No
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Group WhatsApp Link (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.whatsappGroupLink || ''}
-                      onChange={(e) => updateFormData({ whatsappGroupLink: e.target.value })}
-                      placeholder="https://chat.whatsapp.com/..."
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-2">
-                    Key Mobilization Activities Undertaken <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {KEY_ACTIVITIES.map((act) => {
-                      const isChecked = formData.keyActivities.includes(act);
-                      return (
-                        <button
-                          key={act}
-                          type="button"
-                          onClick={() => handleActivityToggle(act)}
-                          className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer ${
-                            isChecked
-                              ? 'bg-brand-50 border-brand-500 text-brand-900 font-bold'
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                          }`}
-                        >
-                          <span>{act}</span>
-                          {isChecked && <Check className="w-4 h-4 text-brand-600 flex-shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {validationErrors.keyActivities && (
-                    <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.keyActivities}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Part E: Political Track Record */}
-            <div className="space-y-5">
-              <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
-                <Vote className="w-5 h-5 text-brand-600" />
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Part 5: Political Track Record & Alignment
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    Previous General Election Mobilization Activity <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(['Both 2019 and 2023', '2023', '2019', 'This is our first time'] as const).map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => updateFormData({ previousElectionActivity: opt })}
-                        className={`p-2.5 rounded-xl border text-xs font-bold transition text-center cursor-pointer ${
-                          formData.previousElectionActivity === opt
-                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Specific Mobilization Role / Impact in Last Election (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.rolePlayedLastElection}
-                    onChange={(e) => updateFormData({ rolePlayedLastElection: e.target.value })}
-                    placeholder="e.g. Canvassed 32 polling units in Kwara South, provided voting day transport"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Patron / Sponsor / Political Alignment (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.leaderSponsorAlignment}
-                    onChange={(e) => updateFormData({ leaderSponsorAlignment: e.target.value })}
-                    placeholder="e.g. Mentored by Party Elders in Ilorin West"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Part F: Support Needed & Meeting Attendance */}
-            <div className="space-y-5">
-              <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-brand-600" />
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Part 6: Support Needed & Directorate Meetings
-                </h2>
-              </div>
-
+              {/* Member Strength Selector */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-2">
-                  Institutional Support Desired from the State Directorate
+                  Declared Estimated Member Strength <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {SUPPORT_TYPES.map((sup) => {
-                    const isChecked = formData.supportNeeded.includes(sup);
+
+                {/* Direct Interactive Clickable Option Pills */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-3">
+                  {MEMBER_STRENGTH_OPTIONS.map((opt) => {
+                    const isSelected = formData.strengthRange === opt.rangeStr;
                     return (
                       <button
-                        key={sup}
+                        key={opt.rangeStr}
                         type="button"
-                        onClick={() => handleSupportToggle(sup)}
-                        className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer ${
-                          isChecked
-                            ? 'bg-sky-50 border-sky-500 text-sky-900 font-bold'
-                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        onClick={() => {
+                          updateFormData({
+                            strengthRange: opt.rangeStr,
+                            totalStrength: opt.value,
+                          });
+                        }}
+                        className={`p-3 rounded-2xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                          isSelected
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-md ring-2 ring-brand-200'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                         }`}
                       >
-                        <span>{sup}</span>
-                        {isChecked && <Check className="w-4 h-4 text-sky-600 flex-shrink-0" />}
+                        <span className="font-extrabold text-xs sm:text-sm leading-tight">{opt.rangeStr}</span>
+                        <span className={`text-[10px] ${isSelected ? 'text-brand-100 font-semibold' : 'text-slate-400'}`}>
+                          Members
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Accessible Styled Native Select Dropdown */}
+                <div className="relative pt-1">
+                  <select
+                    id="member-strength-select"
+                    aria-label="Declared Estimated Member Strength"
+                    value={formData.strengthRange}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const selected = MEMBER_STRENGTH_OPTIONS.find(opt => opt.rangeStr === val);
+                      updateFormData({
+                        strengthRange: val,
+                        totalStrength: selected ? selected.value : 150,
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer pr-10 shadow-xs"
+                  >
+                    {MEMBER_STRENGTH_OPTIONS.map((opt) => (
+                      <option key={opt.rangeStr} value={opt.rangeStr}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 bottom-3 pointer-events-none" />
+                </div>
+                {validationErrors.totalStrength && (
+                  <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.totalStrength}</p>
+                )}
+              </div>
+
+              {/* Key Activities */}
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-2">
+                  Key Mobilization Activities Undertaken <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {KEY_ACTIVITIES.map((act) => {
+                    const isChecked = formData.keyActivities.includes(act);
+                    return (
+                      <button
+                        key={act}
+                        type="button"
+                        onClick={() => handleActivityToggle(act)}
+                        className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer ${
+                          isChecked
+                            ? 'bg-brand-50/80 border-brand-500 text-brand-900 font-bold'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>{act}</span>
+                        <div
+                          className={`w-4 h-4 rounded flex items-center justify-center border transition ${
+                            isChecked ? 'bg-brand-600 border-brand-600 text-white' : 'border-slate-300 bg-white'
+                          }`}
+                        >
+                          {isChecked && <Check className="w-3 h-3" />}
+                        </div>
                       </button>
                     );
                   })}
@@ -1067,19 +799,42 @@ export default function RegistrationWizard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  Willingness to attend physical coordination meetings at the State Secretariat in Ilorin? <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-800 mb-1">
+                  Additional Mobilization Capacity & Notes (Optional)
                 </label>
-                <div className="flex gap-2">
-                  {(['Yes', 'No', 'Maybe'] as const).map((opt) => (
+                <textarea
+                  rows={2}
+                  value={formData.additionalCapacityInfo}
+                  onChange={(e) => updateFormData({ additionalCapacityInfo: e.target.value })}
+                  placeholder="Describe your executive structure, active polling unit coordinators, or mobilization reach..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
+                ></textarea>
+              </div>
+            </div>
+
+            {/* Part B: Political Track Record */}
+            <div className="space-y-5">
+              <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Vote className="w-5 h-5 text-brand-600" />
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+                  Part 2: Political Track Record & Alignment
+                </h2>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-2">
+                  Previous General Election Mobilization Activity <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(['Both 2019 and 2023', '2023', '2019', 'This is our first time'] as const).map((opt) => (
                     <button
                       key={opt}
                       type="button"
-                      onClick={() => updateFormData({ willingAttendMeetings: opt })}
-                      className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                        formData.willingAttendMeetings === opt
+                      onClick={() => updateFormData({ previousElectionActivity: opt })}
+                      className={`p-3 rounded-xl border text-xs font-bold transition text-center cursor-pointer ${
+                        formData.previousElectionActivity === opt
                           ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {opt}
@@ -1087,208 +842,204 @@ export default function RegistrationWizard() {
                   ))}
                 </div>
               </div>
-            </div>
 
-            {/* Part G: Declarations & 2027 Commitment */}
-            <div className="space-y-5 bg-brand-50/50 p-6 sm:p-7 rounded-3xl border border-brand-200">
-              <div className="border-b border-brand-200/60 pb-3 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-brand-700" />
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Part 7: Declarations, Party Supremacy & 2027 Commitment
-                </h2>
-              </div>
-
-              <div className="space-y-3.5">
-                <label className="flex items-start gap-3 cursor-pointer">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Specific Role Played in Last General Election (Optional)
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={formData.commitWork2027}
-                    onChange={(e) => updateFormData({ commitWork2027: e.target.checked })}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 mt-0.5"
+                    type="text"
+                    value={formData.rolePlayedLastElection}
+                    onChange={(e) => updateFormData({ rolePlayedLastElection: e.target.value })}
+                    placeholder="e.g. Grassroots door-to-door, Polling unit agents, Media campaigns"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
                   />
-                  <span className="text-xs sm:text-sm text-slate-800 font-medium">
-                    We solemnly commit our grassroots network and resources to actively mobilize voters for total victory of the <strong>All Progressives Congress (APC) in the 2027 General Elections</strong>.
-                  </span>
-                </label>
-                {validationErrors.commitWork2027 && (
-                  <p className="text-[11px] text-red-600 font-semibold">{validationErrors.commitWork2027}</p>
-                )}
+                </div>
 
-                <label className="flex items-start gap-3 cursor-pointer">
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Leader / Sponsor Alignment (Optional)
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={formData.agreeWithCongress}
-                    onChange={(e) => updateFormData({ agreeWithCongress: e.target.checked })}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 mt-0.5"
+                    type="text"
+                    value={formData.leaderSponsorAlignment}
+                    onChange={(e) => updateFormData({ leaderSponsorAlignment: e.target.value })}
+                    placeholder="e.g. Party stakeholders, patron, political patron"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
                   />
-                  <span className="text-xs sm:text-sm text-slate-800 font-medium">
-                    We agree to uphold party supremacy and align with the guidelines, structure, and strategic coordination of the <strong>APC Stakeholders Congress (Kwara State Chapter)</strong>.
-                  </span>
-                </label>
-                {validationErrors.agreeWithCongress && (
-                  <p className="text-[11px] text-red-600 font-semibold">{validationErrors.agreeWithCongress}</p>
-                )}
-
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.declarationConfirmed}
-                    onChange={(e) => updateFormData({ declarationConfirmed: e.target.checked })}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 mt-0.5"
-                  />
-                  <span className="text-xs sm:text-sm text-slate-800 font-medium">
-                    I declare that all information submitted in this application is accurate and represents the authentic authority of our executive council.
-                  </span>
-                </label>
-                {validationErrors.declarationConfirmed && (
-                  <p className="text-[11px] text-red-600 font-semibold">{validationErrors.declarationConfirmed}</p>
-                )}
-
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.consentDataProcessing}
-                    onChange={(e) => updateFormData({ consentDataProcessing: e.target.checked })}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 mt-0.5"
-                  />
-                  <span className="text-xs sm:text-sm text-slate-800 font-medium">
-                    I consent to the storage and verification of our leadership details on the official APC State Directorate registry.
-                  </span>
-                </label>
-                {validationErrors.consentDataProcessing && (
-                  <p className="text-[11px] text-red-600 font-semibold">{validationErrors.consentDataProcessing}</p>
-                )}
+                </div>
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Part C: Declarations & Affirmations */}
+            <div className="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+                <ShieldCheck className="w-5 h-5 text-brand-600" />
+                <h3 className="text-sm font-extrabold text-slate-900">
+                  Directorate Affirmations & Declarations
+                </h3>
+              </div>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.commitWork2027}
+                  onChange={(e) => updateFormData({ commitWork2027: e.target.checked })}
+                  className="w-4 h-4 mt-0.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer"
+                />
+                <span className="text-xs text-slate-700 leading-relaxed font-medium">
+                  We solemnly pledge and commit to mobilize tirelessly and work for the absolute victory of all All Progressives Congress (APC) candidates in the 2027 general elections. <span className="text-red-500">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.agreeWithCongress}
+                  onChange={(e) => updateFormData({ agreeWithCongress: e.target.checked })}
+                  className="w-4 h-4 mt-0.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer"
+                />
+                <span className="text-xs text-slate-700 leading-relaxed font-medium">
+                  We agree to align with the guidelines, leadership, directives, and harmonized structure of the APC Stakeholders Congress, Kwara State Chapter. <span className="text-red-500">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.declarationConfirmed}
+                  onChange={(e) => updateFormData({ declarationConfirmed: e.target.checked })}
+                  className="w-4 h-4 mt-0.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer"
+                />
+                <span className="text-xs text-slate-700 leading-relaxed font-medium">
+                  I hereby declare that the executive details and declared member strength provided in this registration are truthful and verifiable. <span className="text-red-500">*</span>
+                </span>
+              </label>
+            </div>
+
+            {/* Part D: Support Needed */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-slate-800">
+                Support / Collaboration Needed from the Congress (Mark All Applicable)
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SUPPORT_TYPES.map((sup) => {
+                  const isSelected = formData.supportNeeded.includes(sup);
+                  return (
+                    <button
+                      key={sup}
+                      type="button"
+                      onClick={() => handleSupportToggle(sup)}
+                      className={`p-2.5 rounded-xl border text-xs text-left transition flex items-center justify-between cursor-pointer ${
+                        isSelected
+                          ? 'bg-brand-50 border-brand-500 text-brand-900 font-bold'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="truncate">{sup}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-brand-600 flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Step 2 Actions */}
+            <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
               <button
                 type="button"
-                onClick={handlePrevSection}
-                className="w-full sm:w-auto px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
+                onClick={() => setCurrentStep(1)}
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to Section 1</span>
+                <ArrowLeft className="w-4 h-4" /> Back to Section 1
               </button>
 
               <button
-                type="button"
+                type="submit"
                 disabled={submitting}
-                onClick={handleSubmit}
-                className="w-full sm:w-auto px-9 py-3.5 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 disabled:bg-slate-400 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                className="px-8 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center gap-2 disabled:opacity-50"
               >
-                {submitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>Submitting & Generating Official Letter...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="w-5 h-5" />
-                    <span>Submit Registration</span>
-                  </>
-                )}
+                {submitting ? 'Processing & Generating Letter...' : 'Submit Registration'}
+                <CheckCircle2 className="w-4 h-4" />
               </button>
             </div>
           </div>
-        )}
+        </form>
+      )}
 
-        {/* ================= STEP 3: SUCCESS & DOCUMENT ISSUANCE ================= */}
-        {currentStep === 3 && submitResult?.success && (
-          <div className="max-w-2xl mx-auto py-8 text-center space-y-8">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <CheckCircle2 className="w-10 h-10" />
+      {/* ================= STEP 3: SUCCESS & ACCREDITATION ================= */}
+      {currentStep === 3 && submitResult && (
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-2xl space-y-8 text-center animate-in zoom-in-95 duration-300">
+          <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <ShieldCheck className="w-12 h-12" />
+          </div>
+
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
+              <Sparkles className="w-3.5 h-3.5" /> Registration Approved & Accredited
             </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Congratulations! Registration Completed
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
+              Your forum has been formally approved and admitted as an accredited affiliate of the APC Stakeholders Congress, Kwara State Chapter.
+            </p>
+          </div>
 
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
-                <ShieldCheck className="w-3.5 h-3.5" /> Registration Approved & Accredited
+          {/* Reference Card */}
+          <div className="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-200 max-w-md mx-auto space-y-3 text-left">
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Official Registration Reference Number
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                Registration Successful!
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-                Your forum <strong>{formData.name}</strong> has been officially accredited and integrated into the Kwara State APC Stakeholders registry.
-              </p>
-            </div>
-
-            {/* Official Ref Box */}
-            <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-1">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Official Registration Reference
-              </div>
-              <div className="text-2xl sm:text-3xl font-mono font-extrabold text-brand-700">
+              <span className="text-lg sm:text-xl font-mono font-black text-brand-700 block">
                 {submitResult.registrationRef}
-              </div>
-              <div className="text-[11px] text-slate-500 pt-1">
-                Save this reference code to view your status or re-download your official letter anytime.
-              </div>
+              </span>
             </div>
-
-            {/* Document Download: Official Letter of Recognition */}
-            <div className="bg-white p-6 rounded-2xl border-2 border-brand-500/30 shadow-sm space-y-4">
-              <div className="text-left space-y-1">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-brand-600" />
-                  Official Letter of Recognition / Acceptance
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Your formal letter from the State Directorate is ready for instant download.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                {submitResult.letterDocId ? (
-                  <a
-                    href={`/api/documents/${submitResult.letterDocId}/download`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow"
-                  >
-                    <FileDown className="w-4 h-4" />
-                    <span>Download Letter of Recognition (PDF)</span>
-                  </a>
-                ) : (
-                  <div className="text-xs text-slate-500 py-2">Document generation in progress...</div>
-                )}
-              </div>
+            <div className="border-t border-slate-200 pt-3">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Registered Organization
+              </span>
+              <span className="text-sm font-bold text-slate-800 block">
+                {formData.name}
+              </span>
             </div>
+          </div>
 
-            {/* Exclusive Coordinator WhatsApp Community */}
-            <div className="bg-emerald-50/80 border border-emerald-200 p-6 rounded-2xl space-y-3.5 text-left">
-              <div className="flex items-center gap-2.5 text-emerald-900 font-bold text-sm">
-                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-4 h-4" />
-                </div>
-                <span>Exclusive Coordinator WhatsApp Group</span>
-              </div>
-              <p className="text-xs text-emerald-800 leading-relaxed">
-                Connect directly with senatorial coordinators, party leaders, and fellow forum heads across all 16 LGAs of Kwara State.
-              </p>
+          {/* Download & WhatsApp Actions */}
+          <div className="space-y-4 max-w-md mx-auto">
+            {submitResult.letterDocId && (
               <a
-                href={officialWhatsAppLink}
+                href={`/api/documents/${submitResult.letterDocId}/download`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow"
+                className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black rounded-2xl text-sm shadow-lg transition flex items-center justify-center gap-2"
               >
-                <span>Join Official WhatsApp Community</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
+                Download Official Letter of Recognition (PDF)
               </a>
-            </div>
+            )}
 
-            <div className="pt-2 flex justify-center gap-4 text-xs">
-              <Link href={`/status?ref=${submitResult.registrationRef}`} className="font-bold text-brand-700 hover:underline">
-                View Status on Portal
-              </Link>
-              <span className="text-slate-300">•</span>
-              <Link href="/" className="font-medium text-slate-600 hover:underline">
-                Return to Home
-              </Link>
-            </div>
+            {/* Official WhatsApp Group for Verified Coordinators */}
+            <a
+              href={whatsappGroupLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold rounded-2xl text-sm shadow-md transition flex items-center justify-center gap-2"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Join State Coordinators WhatsApp Group
+            </a>
           </div>
-        )}
-      </div>
+
+          <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 max-w-md mx-auto">
+            <p>
+              An official confirmation email containing your Registration Reference ID and Letter of Recognition PDF has been dispatched to your email.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

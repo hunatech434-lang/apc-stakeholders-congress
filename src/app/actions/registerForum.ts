@@ -295,3 +295,5 @@ export async function submitForumRegistration(
     };
   }
 }
+
+export { submitForumRegistration as registerForumAction };

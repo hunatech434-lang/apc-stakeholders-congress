@@ -49,7 +49,7 @@ export default function Footer() {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              The centralized digital registry, verification, and accreditation platform for APC-aligned forums, associations, and support groups uniting for victory in 2027.
+              The decentralized digital registry, verification and accreditation platform for APC support groups united for victory 2027
             </p>
 
             {/* Secondary APC National Affiliation Badge */}
