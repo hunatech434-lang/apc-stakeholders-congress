@@ -6,6 +6,7 @@ import { fullRegistrationSchema, FullRegistrationInput } from '@/lib/validators'
 import { logAudit } from '@/lib/auditLogger';
 import { generateLetterOfRecognitionPdf } from '@/lib/documentGenerator';
 import { sendRegistrationDocumentsEmail } from '@/lib/emailService';
+import { syncForumToGoogleDrive } from '@/lib/googleDriveSync';
 import fs from 'fs';
 import path from 'path';
 
@@ -118,7 +119,6 @@ export async function submitForumRegistration(
         data: {
           registrationRef,
           name: validData.name.trim(),
-          acronym: validData.acronym?.trim() || null,
           motto: validData.motto?.trim() || null,
           yearEstablished: validData.yearEstablished,
           areaOfCoverage: validData.areaOfCoverage,
@@ -128,12 +128,10 @@ export async function submitForumRegistration(
           wardId: validData.wardId || null,
           wardName: formattedWard || null,
           officeAddress: validData.officeAddress.trim(),
-          meetingVenue: validData.meetingVenue?.trim() || null,
 
           // Leadership
           coordinatorName: validData.coordinatorName.trim(),
           coordinatorPhone: validData.coordinatorPhone.trim(),
-          coordinatorEmail: validData.coordinatorEmail?.trim() || null,
           coordinatorPassportUrl: validData.coordinatorPassportUrl || null,
           secretaryName: validData.secretaryName.trim(),
           secretaryPhone: validData.secretaryPhone.trim(),
@@ -146,7 +144,7 @@ export async function submitForumRegistration(
           otherActivity: validData.otherActivity?.trim() || null,
           hasWhatsappGroup: validData.hasWhatsappGroup,
           whatsappGroupLink: validData.whatsappGroupLink?.trim() || null,
-          additionalCapacityInfo: validData.additionalCapacityInfo?.trim() || null,
+          additionalCapacityInfo: validData.strengthRange ? `Declared Range: ${validData.strengthRange}` : null,
 
           // Political Track Record
           previousElectionActivity: validData.previousElectionActivity,
@@ -182,7 +180,6 @@ export async function submitForumRegistration(
             role: 'Coordinator',
             fullName: validData.coordinatorName.trim(),
             phoneNumber: validData.coordinatorPhone.trim(),
-            email: validData.coordinatorEmail?.trim() || null,
           },
           {
             forumId: createdForum.id,
@@ -196,7 +193,7 @@ export async function submitForumRegistration(
       return createdForum;
     });
 
-    // 6. GENERATE OFFICIAL LETTER OF RECOGNITION / ACCEPTANCE PDF
+    // 6. GENERATE OFFICIAL LETTER OF RECOGNITION PDF
     const storageDir = path.join(process.cwd(), 'storage', 'generated');
     if (!fs.existsSync(storageDir)) {
       fs.mkdirSync(storageDir, { recursive: true });
@@ -212,6 +209,7 @@ export async function submitForumRegistration(
       yearEstablished: forum.yearEstablished,
       approvedAt: now,
       coordinatorName: forum.coordinatorName,
+      officeAddress: forum.officeAddress,
     };
 
     const letterToken = generateVerificationToken();
@@ -232,7 +230,7 @@ export async function submitForumRegistration(
     });
 
     // 7. DISPATCH SMTP EMAIL WITH LETTER OF RECOGNITION PDF ATTACHMENT (Non-blocking)
-    const recipientEmail = validData.coordinatorEmail || validData.forumEmail;
+    const recipientEmail = validData.forumEmail;
     if (recipientEmail) {
       sendRegistrationDocumentsEmail({
         toEmail: recipientEmail,
@@ -244,6 +242,28 @@ export async function submitForumRegistration(
         letterPdfBuffer: letterBuffer,
       }).catch((err) => console.error('Background email dispatch error:', err));
     }
+
+    // 8. Real-Time Google Drive / Google Sheets Sync (Non-blocking)
+    syncForumToGoogleDrive({
+      timestamp: now.toISOString(),
+      registrationRef: forum.registrationRef,
+      forumName: forum.name,
+      motto: forum.motto || '',
+      yearEstablished: forum.yearEstablished,
+      areaOfCoverage: forum.areaOfCoverage,
+      lga: lga?.name || 'Kwara State',
+      ward: forum.wardName || 'All Wards',
+      officeAddress: forum.officeAddress || '',
+      coordinatorName: forum.coordinatorName,
+      coordinatorPhone: forum.coordinatorPhone,
+      secretaryName: forum.secretaryName,
+      secretaryPhone: forum.secretaryPhone,
+      forumEmail: forum.forumEmail || '',
+      memberStrength: forum.totalStrength,
+      capacityRange: validData.strengthRange || '',
+      previousElections: forum.previousElectionActivity || '',
+      status: 'APPROVED_VERIFIED',
+    }).catch((err) => console.error('Background Google Drive sync error:', err));
 
     // 8. Log Audit
     await logAudit({

@@ -51,11 +51,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-3 text-slate-400 text-xs">
             <Link href="/status" className="hover:text-white transition flex items-center gap-1">
-              <Search className="w-3 h-3 text-gold-400" /> Check Status
-            </Link>
-            <span className="text-slate-700">|</span>
-            <Link href="/admin/login" className="hover:text-white transition flex items-center gap-1">
-              <Lock className="w-3 h-3 text-apcRed-500" /> Admin
+              <Search className="w-3 h-3 text-sky-400" /> Check Status
             </Link>
           </div>
         </div>

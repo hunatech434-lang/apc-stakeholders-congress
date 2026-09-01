@@ -35,7 +35,7 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-900">4. Document Security</h2>
           <p>
-            Generated official Certificates and Letters of Recognition are secured via private non-predictable URLs, encrypted session checks, and tamper-evident QR code verification tokens.
+            Generated official Letters of Recognition and accreditation documents are secured via private non-predictable URLs, encrypted session checks, and tamper-evident QR code verification tokens.
           </p>
         </section>
 

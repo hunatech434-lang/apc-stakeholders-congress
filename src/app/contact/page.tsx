@@ -54,7 +54,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-slate-900">Telephone Lines</h3>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      08032010479 • 07030592380 • 08188234455
+                      07030592380 • 08032010479 • 07031693124
                     </p>
                   </div>
                 </div>

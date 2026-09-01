@@ -12,6 +12,7 @@ import {
   MapPin,
   Calendar
 } from 'lucide-react';
+import { GoogleDriveSyncButton } from '@/components/admin/GoogleDriveSyncButton';
 
 export const revalidate = 0;
 
@@ -73,6 +74,9 @@ export default async function AdminReportsPage() {
         </div>
       </div>
 
+      {/* Real-time Google Drive Sync Banner */}
+      <GoogleDriveSyncButton />
+
       {/* Summary KPI Banner */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
@@ -90,7 +94,7 @@ export default async function AdminReportsPage() {
         <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
           <span className="text-xs text-slate-400 font-semibold">Verified & Accredited</span>
           <div className="text-3xl font-black text-emerald-400">{verifiedForums}</div>
-          <p className="text-[10px] text-slate-500">Official certificates issued</p>
+          <p className="text-[10px] text-slate-500">Official letters issued</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">

@@ -11,7 +11,7 @@ import {
   Building2, 
   Calendar, 
   MapPin, 
-  Award,
+  FileText,
   ArrowRight
 } from 'lucide-react';
 
@@ -59,17 +59,16 @@ export default async function VerifyDocumentPage({
 
   const { forum } = doc;
   const isRevoked = doc.isRevoked || forum.status === 'suspended_revoked';
-  const isCert = doc.docType === 'certificate_of_registration';
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-lg w-full bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
         {/* Top Header Strip */}
-        <div className="bg-brand-900 text-white p-6 text-center space-y-2 border-b-4 border-gold-500">
+        <div className="bg-brand-900 text-white p-6 text-center space-y-2 border-b-4 border-sky-400">
           <div className="w-12 h-12 bg-white rounded-xl p-1 mx-auto shadow flex items-center justify-center">
             <Image
-              src="/images/APC-stakeholders-congress-Logo.png"
-              alt="APC Logo"
+              src="/images/official-logo.png"
+              alt="Official Logo"
               width={40}
               height={40}
               className="object-contain"
@@ -91,7 +90,7 @@ export default async function VerifyDocumentPage({
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Authentic & Duly Accredited
               </div>
               <p className="text-xs text-emerald-900 font-medium">
-                This {isCert ? 'Certificate of Registration' : 'Letter of Recognition'} is genuine and officially recorded.
+                This Official Letter of Recognition is genuine and officially recorded.
               </p>
             </div>
           ) : (
@@ -121,7 +120,7 @@ export default async function VerifyDocumentPage({
                 <div>
                   <span className="text-[10px] font-bold uppercase text-slate-400">Document Type</span>
                   <div className="font-bold text-slate-800 text-xs">
-                    {isCert ? 'Certificate of Registration' : 'Letter of Recognition'}
+                    Letter of Recognition
                   </div>
                 </div>
               </div>

@@ -28,26 +28,27 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Format data cleanly (excluding sensitive private notes)
+    // Format data cleanly
     const exportData = forums.map((f, idx) => ({
       'S/N': idx + 1,
       'Registration Ref': f.registrationRef,
       'Forum Name': f.name,
-      'Acronym': f.acronym || 'N/A',
+      'Motto': f.motto || 'N/A',
       'Year Established': f.yearEstablished,
       'Area of Coverage': f.areaOfCoverage,
       'LGA': f.lga?.name || 'Kwara',
-      'Ward': f.wardName || 'N/A',
+      'Ward / Focus': f.wardName || 'All Wards',
       'Office Address': f.officeAddress,
       'Coordinator Name': f.coordinatorName,
       'Coordinator Phone': f.coordinatorPhone,
       'Secretary Name': f.secretaryName,
       'Secretary Phone': f.secretaryPhone,
+      'Official Forum Email': f.forumEmail || 'N/A',
       'Declared Member Strength': f.totalStrength,
+      'Capacity Details': f.additionalCapacityInfo || 'N/A',
       'Previous Election Activity': f.previousElectionActivity,
       'Status': f.status.toUpperCase(),
-      'Submitted Date': f.submittedAt ? new Date(f.submittedAt).toLocaleDateString('en-GB') : 'N/A',
-      'Approved Date': f.approvedAt ? new Date(f.approvedAt).toLocaleDateString('en-GB') : 'N/A',
+      'Registration Date': f.submittedAt ? new Date(f.submittedAt).toLocaleDateString('en-GB') : new Date(f.createdAt).toLocaleDateString('en-GB'),
     }));
 
     // Log export event to audit trail

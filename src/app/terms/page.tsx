@@ -34,7 +34,7 @@ export default function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-900">4. Revocation of Accreditation</h2>
           <p>
-            The Directorate reserves the right to suspend or revoke any Certificate of Registration or Letter of Recognition in instances of anti-party activities, false declaration, or disciplinary infractions.
+            The Directorate reserves the right to suspend or revoke any Letter of Recognition or forum accreditation in instances of anti-party activities, false declaration, or disciplinary infractions.
           </p>
         </section>
       </div>

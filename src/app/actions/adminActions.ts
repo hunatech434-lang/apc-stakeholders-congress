@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { logAudit } from '@/lib/auditLogger';
 import { generateVerificationToken } from '@/lib/refGenerator';
-import { generateCertificatePdf, generateLetterOfRecognitionPdf } from '@/lib/documentGenerator';
+import { generateLetterOfRecognitionPdf } from '@/lib/documentGenerator';
 import fs from 'fs';
 import path from 'path';
 import { revalidatePath } from 'next/cache';
@@ -102,6 +102,7 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
     yearEstablished: forum.yearEstablished,
     approvedAt: forum.approvedAt || new Date(),
     coordinatorName: forum.coordinatorName,
+    officeAddress: forum.officeAddress,
   };
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -110,30 +111,7 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
     fs.mkdirSync(genDir, { recursive: true });
   }
 
-  // 1. Certificate of Registration
-  let certDoc = await prisma.generatedDocument.findFirst({
-    where: { forumId: forum.id, docType: 'certificate_of_registration' },
-  });
-
-  if (!certDoc) {
-    const certToken = generateVerificationToken();
-    const certBuffer = await generateCertificatePdf(forumData, certToken, appUrl);
-    const certFileName = `cert_${forum.registrationRef.replace(/[^a-zA-Z0-9]/g, '_')}_${certToken.slice(0, 8)}.pdf`;
-    const certFilePath = path.join(genDir, certFileName);
-    fs.writeFileSync(certFilePath, certBuffer);
-
-    certDoc = await prisma.generatedDocument.create({
-      data: {
-        forumId: forum.id,
-        docType: 'certificate_of_registration',
-        verificationToken: certToken,
-        filePath: `/storage/generated/${certFileName}`,
-        fileSizeBytes: certBuffer.length,
-      },
-    });
-  }
-
-  // 2. Letter of Recognition
+  // Official Letter of Recognition
   let letterDoc = await prisma.generatedDocument.findFirst({
     where: { forumId: forum.id, docType: 'letter_of_recognition' },
   });
@@ -156,5 +134,31 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
     });
   }
 
-  return { certificate: certDoc, letter: letterDoc };
+  return { letter: letterDoc };
+}
+
+/**
+ * Super Admin & Reporting Viewers can trigger batch sync to Google Drive / Sheets.
+ */
+export async function triggerGoogleDriveSync() {
+  const session = await getSession();
+  if (!session) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  const { syncAllRecordsToGoogleDrive } = await import('@/lib/googleDriveSync');
+  const result = await syncAllRecordsToGoogleDrive();
+
+  if (result.success) {
+    await logAudit({
+      actorId: session.userId,
+      actorEmail: session.email,
+      action: 'GOOGLE_DRIVE_BATCH_SYNC',
+      entity: 'Forum',
+      entityId: 'ALL',
+      details: { recordsSynced: result.count },
+    });
+  }
+
+  return result;
 }

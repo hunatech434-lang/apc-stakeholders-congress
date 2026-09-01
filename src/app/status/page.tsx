@@ -13,7 +13,8 @@ import {
   ExternalLink,
   MapPin,
   Users,
-  ArrowRight
+  ArrowRight,
+  FileText
 } from 'lucide-react';
 
 export const revalidate = 0;
@@ -73,10 +74,10 @@ export default async function StatusPage({
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
             <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Approved & Verified (Accredited)</span>
+              <span>Approved & Accredited</span>
             </div>
             <p className="text-xs text-emerald-800 leading-relaxed">
-              Congratulations! Your forum has been verified by the Kwara State Directorate. Your official documents are available for download below.
+              Congratulations! Your forum has been accredited by the Kwara State Directorate. Your official Letter of Recognition is available for download below.
             </p>
           </div>
         );
@@ -105,7 +106,7 @@ export default async function StatusPage({
               </div>
             )}
             <p className="text-xs text-amber-800">
-              Please contact the State Secretariat at 07030592380 or email apcstakeholderscongress@gmail.com with your reference number to resolve this query.
+              Please contact the State Secretariat at 07030592380 / 08032010479 / 07031693124 or email apcstakeholderscongress@gmail.com with your reference number to resolve this query.
             </p>
           </div>
         );
@@ -148,7 +149,6 @@ export default async function StatusPage({
     }
   };
 
-  const certDoc = forum?.generatedDocs?.find((d: any) => d.docType === 'certificate_of_registration');
   const letterDoc = forum?.generatedDocs?.find((d: any) => d.docType === 'letter_of_recognition');
 
   return (
@@ -157,13 +157,13 @@ export default async function StatusPage({
         {/* Header */}
         <div className="text-center space-y-3 max-w-xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
-            <Search className="w-3.5 h-3.5" /> Registration Status & Documents
+            <Search className="w-3.5 h-3.5" /> Registration Status & Document Retrieval
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Check Forum Status
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Enter your unique Registration Reference Number to check verification progress or re-download approved official documents.
+            Enter your unique Registration Reference Number to check accreditation status or download your official Letter of Recognition.
           </p>
         </div>
 
@@ -234,7 +234,7 @@ export default async function StatusPage({
                   <p className="text-slate-500 font-mono mt-0.5">{forum.registrationRef}</p>
                 </div>
                 <span className="text-slate-500 text-[11px]">
-                  Submitted: {new Date(forum.createdAt).toLocaleDateString('en-GB')}
+                  Registered: {new Date(forum.createdAt).toLocaleDateString('en-GB')}
                 </span>
               </div>
 
@@ -266,14 +266,17 @@ export default async function StatusPage({
                   {letterDoc ? (
                     <a
                       href={`/api/documents/${letterDoc.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="p-4 rounded-2xl bg-brand-50 border border-brand-200 hover:border-brand-500 hover:shadow-md transition flex items-center justify-between group"
                     >
                       <div>
-                        <div className="font-bold text-brand-950 text-xs sm:text-sm">
+                        <div className="font-bold text-brand-950 text-xs sm:text-sm flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-brand-600" />
                           Official Letter of Recognition / Acceptance
                         </div>
                         <div className="text-[11px] text-brand-700 mt-0.5">
-                          Official Letterhead Signed PDF
+                          Official Letterhead Signed PDF (Tamper-Evident QR Code)
                         </div>
                       </div>
                       <div className="p-2.5 bg-brand-600 group-hover:bg-brand-500 text-white rounded-xl transition">
@@ -285,10 +288,6 @@ export default async function StatusPage({
                       Official Letter of Recognition is being prepared by the Directorate.
                     </div>
                   )}
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600">
-                  <strong>Physical Certificate Presentation:</strong> Official Certificates of Registration will be presented physically at the upcoming State Stakeholders Convention / Secretariat.
                 </div>
               </div>
             )}

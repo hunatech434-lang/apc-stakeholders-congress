@@ -11,31 +11,51 @@ import {
   Vote, 
   ShieldCheck, 
   HelpCircle, 
-  UploadCloud, 
-  FileCheck2, 
   CheckCircle2, 
   ArrowLeft, 
   ArrowRight, 
   AlertCircle, 
   MessageCircle,
   ExternalLink,
-  ChevronRight,
-  Sparkles,
+  ChevronDown,
   FileDown,
   FileText,
-  Lock,
-  Phone,
-  Mail,
-  Calendar,
   Check
 } from 'lucide-react';
 import { submitForumRegistration, RegistrationResult } from '@/app/actions/registerForum';
 
-interface Lga {
-  id: number;
-  name: string;
-  senatorialDistrict?: { name: string };
-}
+// The 16 Local Government Areas of Kwara State grouped by Senatorial District
+const KWARA_LGAS = [
+  // Kwara Central
+  { id: 1, name: 'Asa', district: 'Kwara Central' },
+  { id: 2, name: 'Ilorin East', district: 'Kwara Central' },
+  { id: 3, name: 'Ilorin South', district: 'Kwara Central' },
+  { id: 4, name: 'Ilorin West', district: 'Kwara Central' },
+
+  // Kwara North
+  { id: 5, name: 'Baruten', district: 'Kwara North' },
+  { id: 6, name: 'Edu', district: 'Kwara North' },
+  { id: 7, name: 'Kaiama', district: 'Kwara North' },
+  { id: 8, name: 'Moro', district: 'Kwara North' },
+  { id: 9, name: 'Pategi', district: 'Kwara North' },
+
+  // Kwara South
+  { id: 10, name: 'Ekiti', district: 'Kwara South' },
+  { id: 11, name: 'Ifelodun', district: 'Kwara South' },
+  { id: 12, name: 'Irepodun', district: 'Kwara South' },
+  { id: 13, name: 'Isin', district: 'Kwara South' },
+  { id: 14, name: 'Offa', district: 'Kwara South' },
+  { id: 15, name: 'Oke Ero', district: 'Kwara South' },
+  { id: 16, name: 'Oyun', district: 'Kwara South' },
+];
+
+const MEMBER_STRENGTH_OPTIONS = [
+  { label: '100 - 200 Members', rangeStr: '100 - 200', value: 150 },
+  { label: '200 - 300 Members', rangeStr: '200 - 300', value: 250 },
+  { label: '300 - 500 Members', rangeStr: '300 - 500', value: 400 },
+  { label: '500 - 1,000 Members', rangeStr: '500 - 1,000', value: 750 },
+  { label: '1,000 and Above', rangeStr: '1,000 and above', value: 1200 },
+];
 
 const KEY_ACTIVITIES = [
   'Voter Mobilization',
@@ -69,17 +89,14 @@ export default function RegistrationWizard() {
   // Step 2: Section 2 (Capacity, Political Track Record & Commitments)
   // Step 3: Success Screen (Accreditation & Letter of Recognition)
   const [currentStep, setCurrentStep] = useState(1);
-  const [lgas, setLgas] = useState<Lga[]>([]);
-  const [loadingGeo, setLoadingGeo] = useState(false);
+  const [lgas, setLgas] = useState(KWARA_LGAS);
   const [submitting, setSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<RegistrationResult | null>(null);
-  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
     // Section 1: Forum Details & Geography
     name: '',
-    acronym: '',
     motto: '',
     yearEstablished: 2023,
     areaOfCoverage: 'Kwara State at Large',
@@ -92,20 +109,18 @@ export default function RegistrationWizard() {
     wardName: '',
     isAllWards: true,
     officeAddress: '',
-    meetingVenue: '',
 
     // Section 1: Leadership & Contacts
     coordinatorName: '',
     coordinatorPhone: '',
-    coordinatorEmail: '',
-    coordinatorPassportUrl: '',
     secretaryName: '',
     secretaryPhone: '',
     forumEmail: '',
     socialMediaHandles: '',
 
     // Section 2: Structure & Capacity
-    totalStrength: 100,
+    totalStrength: 150,
+    strengthRange: '100 - 200',
     keyActivities: ['Voter Mobilization', 'Sensitization / Awareness'] as string[],
     otherActivity: '',
     hasWhatsappGroup: true,
@@ -128,33 +143,24 @@ export default function RegistrationWizard() {
     willingAttendMeetings: 'Yes' as 'Yes' | 'No' | 'Maybe',
 
     // Section 2: Optional Documents
+    coordinatorPassportUrl: '',
     resolutionLetterUrl: '',
     supportingDocumentUrl: '',
   });
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  // 1. Load LGAs on mount
+  // 1. Sync database LGAs if available, while keeping fallback intact
   useEffect(() => {
     async function loadLgas() {
       try {
-        setLoadingGeo(true);
         const res = await fetch('/api/geography?type=lgas');
         const data = await res.json();
         if (data.lgas && data.lgas.length > 0) {
           setLgas(data.lgas);
-          if (!formData.lgaId) {
-            setFormData((prev) => ({
-              ...prev,
-              lgaId: data.lgas[0].id,
-              selectedLgaIds: [data.lgas[0].id],
-            }));
-          }
         }
       } catch (err) {
-        console.error('Failed to load LGAs:', err);
-      } finally {
-        setLoadingGeo(false);
+        // Fallback KWARA_LGAS already loaded
       }
     }
     loadLgas();
@@ -163,7 +169,7 @@ export default function RegistrationWizard() {
   // 2. Draft Auto-Save to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('apc_forum_reg_draft_v2');
+      const saved = localStorage.getItem('apc_forum_reg_draft_v4');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -177,7 +183,7 @@ export default function RegistrationWizard() {
     setFormData((prev) => {
       const updated = { ...prev, ...fields };
       if (typeof window !== 'undefined') {
-        localStorage.setItem('apc_forum_reg_draft_v2', JSON.stringify(updated));
+        localStorage.setItem('apc_forum_reg_draft_v4', JSON.stringify(updated));
       }
       return updated;
     });
@@ -191,7 +197,7 @@ export default function RegistrationWizard() {
     });
   };
 
-  // Toggle helpers
+  // Toggle LGA Checkbox
   const handleLgaToggle = (lgaId: number) => {
     let current = [...formData.selectedLgaIds];
     if (current.includes(lgaId)) {
@@ -211,6 +217,7 @@ export default function RegistrationWizard() {
     });
   };
 
+  // Select All 16 LGAs Toggle
   const handleAllLgasToggle = (checked: boolean) => {
     if (checked) {
       const allIds = lgas.map((l) => l.id);
@@ -247,34 +254,6 @@ export default function RegistrationWizard() {
       current.push(sup);
     }
     updateFormData({ supportNeeded: current });
-  };
-
-  // File Upload Handler
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const data = new FormData();
-    data.append('file', file);
-    data.append('category', field);
-
-    try {
-      setUploadingField(field);
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: data,
-      });
-      const json = await res.json();
-      if (json.success && json.fileUrl) {
-        updateFormData({ [field]: json.fileUrl });
-      } else {
-        alert(json.error || 'Upload failed');
-      }
-    } catch (err) {
-      alert('File upload failed. Please verify file format and size (<5MB).');
-    } finally {
-      setUploadingField(null);
-    }
   };
 
   // Section 1 Validation
@@ -315,7 +294,7 @@ export default function RegistrationWizard() {
     const errors: Record<string, string> = {};
 
     if (!formData.totalStrength || formData.totalStrength < 1) {
-      errors.totalStrength = 'Please declare estimated member strength (at least 1).';
+      errors.totalStrength = 'Please select estimated member strength.';
     }
     if (formData.keyActivities.length === 0) {
       errors.keyActivities = 'Please select at least one key mobilization activity.';
@@ -377,7 +356,7 @@ export default function RegistrationWizard() {
       setSubmitResult(res);
 
       if (res.success) {
-        localStorage.removeItem('apc_forum_reg_draft_v2');
+        localStorage.removeItem('apc_forum_reg_draft_v4');
         setCurrentStep(3); // Show Success Screen
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (res.fieldErrors) {
@@ -502,7 +481,7 @@ export default function RegistrationWizard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1">
                     Official Name of Forum / Support Group <span className="text-red-500">*</span>
                   </label>
@@ -518,19 +497,6 @@ export default function RegistrationWizard() {
                   {validationErrors.name && (
                     <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.name}</p>
                   )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Acronym / Short Name (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.acronym}
-                    onChange={(e) => updateFormData({ acronym: e.target.value })}
-                    placeholder="e.g. KAYV"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
                 </div>
 
                 <div>
@@ -589,16 +555,16 @@ export default function RegistrationWizard() {
               </div>
             </div>
 
-            {/* Part B: Operational Geography */}
+            {/* Part B: Operational Geography (16 LGAs of Kwara) */}
             <div className="space-y-5">
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-brand-600" />
                   <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                    Part 2: Operational Geography & Secretariat Location
+                    Part 2: Operational Geography (16 Kwara LGAs)
                   </h2>
                 </div>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-brand-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1.5 rounded-xl border border-brand-200">
                   <input
                     type="checkbox"
                     checked={formData.isAllLgas}
@@ -609,11 +575,51 @@ export default function RegistrationWizard() {
                 </label>
               </div>
 
+              {/* Primary LGA Dropdown */}
+              <div>
+                <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                  Primary Local Government Area (LGA) <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.lgaId}
+                    onChange={(e) => {
+                      const id = parseInt(e.target.value, 10);
+                      updateFormData({
+                        lgaId: id,
+                        selectedLgaIds: formData.selectedLgaIds.includes(id)
+                          ? formData.selectedLgaIds
+                          : [...formData.selectedLgaIds, id],
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer pr-10"
+                  >
+                    <optgroup label="Kwara Central">
+                      {KWARA_LGAS.filter(l => l.district === 'Kwara Central').map(l => (
+                        <option key={l.id} value={l.id}>{l.name} LGA</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Kwara North">
+                      {KWARA_LGAS.filter(l => l.district === 'Kwara North').map(l => (
+                        <option key={l.id} value={l.id}>{l.name} LGA</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Kwara South">
+                      {KWARA_LGAS.filter(l => l.district === 'Kwara South').map(l => (
+                        <option key={l.id} value={l.id}>{l.name} LGA</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-3 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Multi-LGA Checkbox Matrix */}
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-2">
-                  Select Local Government Area(s) of Operation <span className="text-red-500">*</span>
+                  Operational Presence (Mark All Applicable LGAs) <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-200 max-h-56 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
                   {lgas.map((l) => {
                     const isSelected = formData.selectedLgaIds.includes(l.id);
                     return (
@@ -621,9 +627,9 @@ export default function RegistrationWizard() {
                         key={l.id}
                         type="button"
                         onClick={() => handleLgaToggle(l.id)}
-                        className={`p-2 rounded-lg text-xs font-semibold border transition text-left flex items-center justify-between ${
+                        className={`p-2.5 rounded-xl text-xs font-semibold border transition text-left flex items-center justify-between ${
                           isSelected
-                            ? 'bg-brand-600 text-white border-brand-600 shadow-xs'
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-xs font-bold'
                             : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                         }`}
                       >
@@ -665,19 +671,6 @@ export default function RegistrationWizard() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Regular Meeting Venue (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.meetingVenue}
-                    onChange={(e) => updateFormData({ meetingVenue: e.target.value })}
-                    placeholder="e.g. Community Town Hall, Offa"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
                   <label className="block text-xs font-bold text-slate-800 mb-1">
                     Office / Secretariat Street Address <span className="text-red-500">*</span>
                   </label>
@@ -745,33 +738,6 @@ export default function RegistrationWizard() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Coordinator Email Address (Optional)
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.coordinatorEmail}
-                    onChange={(e) => updateFormData({ coordinatorEmail: e.target.value })}
-                    placeholder="e.g. coordinator@gmail.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                  <p className="text-[10px] text-slate-500 mt-1">Official letter of recognition will be sent here upon completion.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Official Forum Email (Optional)
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.forumEmail}
-                    onChange={(e) => updateFormData({ forumEmail: e.target.value })}
-                    placeholder="e.g. youthvanguard@gmail.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     Secretary Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -806,7 +772,20 @@ export default function RegistrationWizard() {
                   )}
                 </div>
 
-                <div className="md:col-span-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                    Official Forum Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.forumEmail}
+                    onChange={(e) => updateFormData({ forumEmail: e.target.value })}
+                    placeholder="e.g. youthvanguard@gmail.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+
+                <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1">
                     Social Media Handles / Links (Optional)
                   </label>
@@ -826,7 +805,7 @@ export default function RegistrationWizard() {
               <button
                 type="button"
                 onClick={handleNextSection}
-                className="px-8 py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow"
+                className="px-8 py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow cursor-pointer"
               >
                 <span>Continue to Section 2: Capacity & Declarations</span>
                 <ArrowRight className="w-4 h-4" />
@@ -848,56 +827,120 @@ export default function RegistrationWizard() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Declared Estimated Member Strength <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.totalStrength}
-                    onChange={(e) => updateFormData({ totalStrength: parseInt(e.target.value, 10) || 1 })}
-                    className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 ${
-                      validationErrors.totalStrength ? 'border-red-400 bg-red-50/20' : 'border-slate-300'
-                    }`}
-                  />
+              <div className="space-y-5">
+                {/* Declared Member Strength Selector (Dual Dropdown + Interactive Option Pills) */}
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <label className="block text-xs font-bold text-slate-900">
+                      Declared Estimated Member Strength <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-brand-700 font-semibold">
+                      Selected: <strong>{formData.strengthRange || '100 - 200'}</strong> ({formData.totalStrength} est. count)
+                    </span>
+                  </div>
+
+                  {/* 1. Direct Clickable Option Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                    {MEMBER_STRENGTH_OPTIONS.map((opt) => {
+                      const isSelected = formData.strengthRange === opt.rangeStr;
+                      return (
+                        <button
+                          key={opt.rangeStr}
+                          type="button"
+                          onClick={() => {
+                            updateFormData({
+                              strengthRange: opt.rangeStr,
+                              totalStrength: opt.value,
+                            });
+                          }}
+                          className={`p-3 rounded-xl border text-xs font-bold transition text-center flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                            isSelected
+                              ? 'bg-brand-600 text-white border-brand-600 shadow-md ring-2 ring-brand-500/20'
+                              : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100 hover:border-slate-400'
+                          }`}
+                        >
+                          <span className="text-sm font-extrabold">{opt.rangeStr}</span>
+                          <span className="text-[10px] font-medium opacity-85">Members</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* 2. Accessible Native Dropdown Selector */}
+                  <div className="relative pt-1">
+                    <select
+                      id="member-strength-select"
+                      aria-label="Declared Estimated Member Strength"
+                      value={formData.strengthRange}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const selected = MEMBER_STRENGTH_OPTIONS.find(opt => opt.rangeStr === val);
+                        updateFormData({
+                          strengthRange: val,
+                          totalStrength: selected ? selected.value : 150,
+                        });
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white focus:ring-2 focus:ring-brand-500 appearance-none cursor-pointer pr-10 shadow-xs"
+                    >
+                      {MEMBER_STRENGTH_OPTIONS.map((opt) => (
+                        <option key={opt.rangeStr} value={opt.rangeStr}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 bottom-3 pointer-events-none" />
+                  </div>
                   {validationErrors.totalStrength && (
                     <p className="text-[11px] text-red-600 font-semibold mt-1">{validationErrors.totalStrength}</p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
-                    Internal WhatsApp Group Available?
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateFormData({ hasWhatsappGroup: true })}
-                      className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition ${
-                        formData.hasWhatsappGroup
-                          ? 'bg-brand-600 text-white border-brand-600'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
-                      }`}
-                    >
-                      Yes, We Have a Group
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateFormData({ hasWhatsappGroup: false })}
-                      className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition ${
-                        !formData.hasWhatsappGroup
-                          ? 'bg-brand-600 text-white border-brand-600'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
-                      }`}
-                    >
-                      No
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                      Internal WhatsApp Group Available?
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => updateFormData({ hasWhatsappGroup: true })}
+                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                          formData.hasWhatsappGroup
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                            : 'bg-slate-50 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        Yes, We Have a Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateFormData({ hasWhatsappGroup: false })}
+                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                          !formData.hasWhatsappGroup
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                            : 'bg-slate-50 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        No
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                      Group WhatsApp Link (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.whatsappGroupLink || ''}
+                      onChange={(e) => updateFormData({ whatsappGroupLink: e.target.value })}
+                      placeholder="https://chat.whatsapp.com/..."
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-900 bg-white placeholder-slate-400 focus:ring-2 focus:ring-brand-500"
+                    />
                   </div>
                 </div>
 
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-xs font-bold text-slate-800 mb-2">
                     Key Mobilization Activities Undertaken <span className="text-red-500">*</span>
                   </label>
@@ -909,7 +952,7 @@ export default function RegistrationWizard() {
                           key={act}
                           type="button"
                           onClick={() => handleActivityToggle(act)}
-                          className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between ${
+                          className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer ${
                             isChecked
                               ? 'bg-brand-50 border-brand-500 text-brand-900 font-bold'
                               : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -948,7 +991,7 @@ export default function RegistrationWizard() {
                         key={opt}
                         type="button"
                         onClick={() => updateFormData({ previousElectionActivity: opt })}
-                        className={`p-2.5 rounded-xl border text-xs font-bold transition text-center ${
+                        className={`p-2.5 rounded-xl border text-xs font-bold transition text-center cursor-pointer ${
                           formData.previousElectionActivity === opt
                             ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
                             : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -1009,7 +1052,7 @@ export default function RegistrationWizard() {
                         key={sup}
                         type="button"
                         onClick={() => handleSupportToggle(sup)}
-                        className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between ${
+                        className={`p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer ${
                           isChecked
                             ? 'bg-sky-50 border-sky-500 text-sky-900 font-bold'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -1033,7 +1076,7 @@ export default function RegistrationWizard() {
                       key={opt}
                       type="button"
                       onClick={() => updateFormData({ willingAttendMeetings: opt })}
-                      className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition ${
+                      className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
                         formData.willingAttendMeetings === opt
                           ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
                           : 'bg-slate-50 text-slate-700 border-slate-200'
@@ -1123,7 +1166,7 @@ export default function RegistrationWizard() {
               <button
                 type="button"
                 onClick={handlePrevSection}
-                className="w-full sm:w-auto px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Section 1</span>
@@ -1133,7 +1176,7 @@ export default function RegistrationWizard() {
                 type="button"
                 disabled={submitting}
                 onClick={handleSubmit}
-                className="w-full sm:w-auto px-9 py-3.5 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 disabled:bg-slate-400 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg"
+                className="w-full sm:w-auto px-9 py-3.5 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 disabled:bg-slate-400 text-white font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -1179,7 +1222,7 @@ export default function RegistrationWizard() {
                 {submitResult.registrationRef}
               </div>
               <div className="text-[11px] text-slate-500 pt-1">
-                Save this reference code to view your status or re-download your documents anytime.
+                Save this reference code to view your status or re-download your official letter anytime.
               </div>
             </div>
 
@@ -1209,10 +1252,6 @@ export default function RegistrationWizard() {
                 ) : (
                   <div className="text-xs text-slate-500 py-2">Document generation in progress...</div>
                 )}
-              </div>
-
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-[11px] text-slate-600">
-                <strong>Physical Certificate Presentation:</strong> Official Certificates of Registration will be presented physically at the upcoming State Stakeholders Convention / Secretariat.
               </div>
             </div>
 

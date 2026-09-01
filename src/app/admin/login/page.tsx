@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Mail, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Lock, User, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
 import { loginAdmin } from '@/app/actions/authActions';
 
 export default function AdminLoginPage() {
@@ -43,12 +43,14 @@ export default function AdminLoginPage() {
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Public Website
         </Link>
 
-        <div className="w-16 h-16 bg-white rounded-2xl p-2 mx-auto shadow-lg flex items-center justify-center">
+        {/* Official Platform Logo */}
+        <div className="w-18 h-18 bg-white rounded-2xl p-2 mx-auto shadow-xl flex items-center justify-center border border-slate-700/50">
           <Image
-            src="/images/APC-stakeholders-congress-Logo.png"
-            alt="APC Logo"
-            width={52}
-            height={52}
+            src="/images/official-logo.png"
+            alt="APC Stakeholders Congress Official Logo"
+            width={58}
+            height={58}
+            priority
             className="object-contain"
           />
         </div>
@@ -73,18 +75,20 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1">
-                Authorized Email Address
+                Authorized Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Mail className="w-4 h-4" />
+                  <User className="w-4 h-4" />
                 </div>
                 <input
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="username"
                   required
-                  placeholder="admin@apcstakeholderscongress.ng"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  placeholder="Username"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-mono"
                 />
               </div>
             </div>
@@ -101,7 +105,7 @@ export default function AdminLoginPage() {
                   type="password"
                   name="password"
                   required
-                  placeholder="••••••••••••"
+                  placeholder="Password"
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                 />
               </div>

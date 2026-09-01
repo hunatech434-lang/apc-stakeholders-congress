@@ -149,8 +149,8 @@ export default function Footer() {
                 <span>APC Kwara North House, Fate Road, Ilorin, Kwara State, Nigeria</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-gold-400 flex-shrink-0" />
-                <span>08032010479, 07030592380, 08188234455</span>
+                <Phone className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                <span>07030592380, 08032010479, 07031693124</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-sky-400 flex-shrink-0" />
@@ -158,22 +158,23 @@ export default function Footer() {
                   apcstakeholderscongress@gmail.com
                 </a>
               </li>
-              <li className="pt-2">
-                <Link
-                  href="/admin/login"
-                  className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition py-1 px-2.5 rounded bg-slate-900 border border-slate-800"
-                >
-                  <Lock className="w-3 h-3 text-apcRed-500" />
-                  Staff / Admin Login
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom copyright */}
         <div className="mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {currentYear} APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
+          <div className="flex items-center gap-2">
+            <p>© {currentYear} APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
+            <Link
+              href="/admin/login"
+              className="text-slate-700 hover:text-slate-400 transition"
+              title="Authorized Directorate Portal"
+              aria-label="Directorate Portal"
+            >
+              <Lock className="w-3 h-3" />
+            </Link>
+          </div>
           <div className="flex items-center gap-4 text-slate-400">
             <Link href="/privacy" className="hover:underline">Privacy Notice</Link>
             <span>•</span>

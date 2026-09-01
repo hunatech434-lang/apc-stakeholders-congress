@@ -157,7 +157,7 @@ export async function sendRegistrationDocumentsEmail(params: SendRegistrationDoc
           </div>
 
           <p style="font-size: 12px; color: #64748b;">
-            For enquiries or secretariat appointments, contact the State Secretariat at <em>APC Kwara North House, Fate Road, Ilorin</em> or call 07030592380 / 08032010479.
+            For enquiries or secretariat appointments, contact the State Secretariat at <em>APC Kwara North House, Fate Road, Ilorin</em> or call 07030592380 / 08032010479 / 07031693124.
           </p>
         </div>
 

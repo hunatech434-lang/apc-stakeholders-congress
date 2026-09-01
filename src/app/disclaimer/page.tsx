@@ -13,7 +13,7 @@ export default function DisclaimerPage() {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-slate-900">1. Official Platform</h2>
           <p>
-            This portal is the official digital registry and communication tool of the APC Stakeholders Congress (Kwara State Chapter). Any unauthorized duplication, fraudulent issuance of certificates, or impersonation of the Congress Directorate is strictly prohibited and subject to prosecution under applicable Nigerian laws.
+            This portal is the official digital registry and communication tool of the APC Stakeholders Congress (Kwara State Chapter). Any unauthorized duplication, fraudulent issuance of accreditation documents or letters of recognition, or impersonation of the Congress Directorate is strictly prohibited and subject to prosecution under applicable Nigerian laws.
           </p>
         </section>
 

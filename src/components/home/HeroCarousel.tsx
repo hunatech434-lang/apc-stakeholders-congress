@@ -122,7 +122,7 @@ export default function HeroCarousel() {
             </div>
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4 text-sky-400 flex-shrink-0" />
-              <span>Official Certificate & Letter</span>
+              <span>Official Letter of Recognition</span>
             </div>
             <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
               <Landmark className="w-4 h-4 text-sky-300 flex-shrink-0" />

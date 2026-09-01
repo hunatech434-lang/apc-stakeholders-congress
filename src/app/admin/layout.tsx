@@ -31,19 +31,22 @@ export default async function AdminLayout({
   }
 
   const roleLabels: Record<string, string> = {
-    super_admin: 'Super Admin',
+    super_admin: 'Super Admin (All Access)',
     state_admin: 'State Admin',
     verification_officer: 'Verification Officer',
-    content_editor: 'Content Editor',
-    reporting_viewer: 'Reporting Viewer',
+    content_editor: 'Media & Operations',
+    reporting_viewer: 'DG / Reporting Viewer',
   };
 
-  const navItems = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Forums & Registrations', href: '/admin/forums', icon: FileCheck2 },
-    { name: 'Reports & Analytics', href: '/admin/reports', icon: BarChart3 },
-    { name: 'News & Announcements (CMS)', href: '/admin/cms', icon: Newspaper },
+  const allNavItems = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, roles: ['super_admin', 'state_admin', 'reporting_viewer', 'content_editor', 'verification_officer'] },
+    { name: 'Forums & Registrations', href: '/admin/forums', icon: FileCheck2, roles: ['super_admin', 'state_admin', 'reporting_viewer', 'content_editor', 'verification_officer'] },
+    { name: 'Reports & Analytics', href: '/admin/reports', icon: BarChart3, roles: ['super_admin', 'state_admin', 'reporting_viewer', 'content_editor'] },
+    { name: 'News & Events (CMS)', href: '/admin/cms', icon: Newspaper, roles: ['super_admin', 'state_admin', 'content_editor'] },
+    { name: 'Admin Access Control', href: '/admin/users', icon: ShieldCheck, roles: ['super_admin'] },
   ];
+
+  const navItems = allNavItems.filter((item) => item.roles.includes(session.roleId));
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col md:flex-row text-slate-100">

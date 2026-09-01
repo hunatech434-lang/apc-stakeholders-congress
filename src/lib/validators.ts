@@ -23,7 +23,6 @@ const optionalEmailSchema = z.string().optional().nullable().transform((val) => 
 // Section 1 Schema (Forum Identity, Geography, and Leadership Contacts)
 export const section1Schema = z.object({
   name: z.string().min(2, 'Forum name must be at least 2 characters'),
-  acronym: z.string().optional().nullable(),
   motto: z.string().optional().nullable(),
   yearEstablished: z.coerce
     .number({ invalid_type_error: 'Year must be a number' })
@@ -38,12 +37,10 @@ export const section1Schema = z.object({
   wardId: z.coerce.number().optional().nullable(),
   wardName: z.string().optional().nullable(),
   isAllWards: z.boolean().optional().default(false),
-  officeAddress: z.string().min(3, 'Office address / location is required'),
-  meetingVenue: z.string().optional().nullable(),
+  officeAddress: z.string().min(3, 'Office / secretariat address is required'),
 
   coordinatorName: z.string().min(2, 'Coordinator name is required'),
   coordinatorPhone: nigerianPhoneSchema,
-  coordinatorEmail: optionalEmailSchema,
   secretaryName: z.string().min(2, 'Secretary name is required'),
   secretaryPhone: nigerianPhoneSchema,
   forumEmail: optionalEmailSchema,
@@ -55,6 +52,7 @@ export const section2Schema = z.object({
   totalStrength: z.coerce
     .number({ invalid_type_error: 'Total strength must be a number' })
     .min(1, 'Declared member strength must be at least 1'),
+  strengthRange: z.string().optional().nullable(),
   keyActivities: z
     .array(z.string())
     .min(1, 'Please select at least one key mobilization activity'),
@@ -102,8 +100,8 @@ export type FullRegistrationInput = z.infer<typeof fullRegistrationSchema>;
 
 // Admin & CMS Schemas
 export const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
-  password: z.string().min(1, 'Password is required'),
+  identifier: z.string().min(1, 'Username or Email is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export const reviewDecisionSchema = z.object({

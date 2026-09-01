@@ -64,7 +64,6 @@ export default function VerificationControls({
     }
   };
 
-  const certDoc = generatedDocs.find((d) => d.docType === 'certificate_of_registration');
   const letterDoc = generatedDocs.find((d) => d.docType === 'letter_of_recognition');
 
   return (
@@ -173,29 +172,11 @@ export default function VerificationControls({
       {/* Generated Documents Section */}
       {status === 'approved_verified' && (
         <div className="pt-4 border-t border-slate-800 space-y-3">
-          <h4 className="text-xs font-bold text-gold-400 uppercase tracking-wider">
+          <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
             Official Generated Artifacts
           </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {certDoc ? (
-              <a
-                href={`/api/documents/${certDoc.id}/download`}
-                target="_blank"
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-brand-500 flex items-center justify-between text-xs transition"
-              >
-                <div>
-                  <div className="font-bold text-white">Certificate of Registration</div>
-                  <div className="text-[10px] text-slate-500">PDF • Dynamic Seal & QR</div>
-                </div>
-                <FileDown className="w-4 h-4 text-brand-400" />
-              </a>
-            ) : (
-              <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-xs text-slate-500">
-                Generating Certificate...
-              </div>
-            )}
-
+          <div className="grid grid-cols-1 gap-3">
             {letterDoc ? (
               <a
                 href={`/api/documents/${letterDoc.id}/download`}
@@ -203,14 +184,14 @@ export default function VerificationControls({
                 className="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-brand-500 flex items-center justify-between text-xs transition"
               >
                 <div>
-                  <div className="font-bold text-white">Letter of Recognition</div>
-                  <div className="text-[10px] text-slate-500">PDF • Official Letterhead</div>
+                  <div className="font-bold text-white">Official Letter of Recognition</div>
+                  <div className="text-[10px] text-slate-500">PDF • Official Letterhead & QR Code</div>
                 </div>
                 <FileDown className="w-4 h-4 text-brand-400" />
               </a>
             ) : (
               <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-xs text-slate-500">
-                Generating Letter...
+                Official Letter of Recognition generating...
               </div>
             )}
           </div>

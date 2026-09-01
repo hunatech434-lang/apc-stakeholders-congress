@@ -121,7 +121,7 @@ export default function AboutPage() {
             </div>
             <div className="flex items-start gap-2">
               <Phone className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
-              <span>08032010479, 07030592380, 08188234455</span>
+              <span>07030592380, 08032010479, 07031693124</span>
             </div>
             <div className="flex items-start gap-2">
               <Mail className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
