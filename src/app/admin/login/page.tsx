@@ -12,11 +12,16 @@ export default async function AdminLoginPage({
 }) {
   const session = await getSession();
   const params = await searchParams;
-  const targetRedirect = params.redirect || '/admin/dashboard';
+  let target = params?.redirect || '/admin/dashboard';
 
-  // If already logged in, redirect directly to dashboard
-  if (session) {
-    redirect(targetRedirect);
+  // Prevent redirect loops
+  if (!target || target.includes('/admin/login') || target === '/admin') {
+    target = '/admin/dashboard';
+  }
+
+  // Only redirect if session is definitely valid
+  if (session && session.userId) {
+    redirect(target);
   }
 
   return <AdminLoginForm />;

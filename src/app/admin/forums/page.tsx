@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { Search, Filter, Download, ChevronRight, Eye } from 'lucide-react';
 
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function AdminForumsPage({
@@ -10,6 +14,11 @@ export default async function AdminForumsPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string; lga?: string; area?: string }>;
 }) {
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   const params = await searchParams;
   const q = params.q?.trim() || '';
   const status = params.status || '';

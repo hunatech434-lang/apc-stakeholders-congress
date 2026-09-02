@@ -3,10 +3,18 @@ import { prisma } from '@/lib/prisma';
 import AdminCmsManager from '@/components/admin/AdminCmsManager';
 import { Newspaper } from 'lucide-react';
 
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function AdminCmsPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   const announcements = await prisma.announcement.findMany({
     orderBy: { createdAt: 'desc' },
   });

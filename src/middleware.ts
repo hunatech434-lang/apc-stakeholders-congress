@@ -9,32 +9,29 @@ const SECRET_KEY = new TextEncoder().encode(
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Base /admin redirect to dashboard or login
+  // 1. Never intercept or loop on /admin/login
+  if (pathname === '/admin/login' || pathname.startsWith('/admin/login/')) {
+    return NextResponse.next();
+  }
+
+  // 2. Base /admin redirect to dashboard or login
   if (pathname === '/admin' || pathname === '/admin/') {
     const token = request.cookies.get('apc_congress_session')?.value;
     if (token) {
       try {
         await jwtVerify(token, SECRET_KEY);
         return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-      } catch (e) {}
+      } catch (e) {
+        const res = NextResponse.redirect(new URL('/admin/login', request.url));
+        res.cookies.delete('apc_congress_session');
+        return res;
+      }
     }
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  // 2. If user already logged in and visits /admin/login, redirect to dashboard
-  if (pathname === '/admin/login' || pathname === '/admin/login/') {
-    const token = request.cookies.get('apc_congress_session')?.value;
-    if (token) {
-      try {
-        await jwtVerify(token, SECRET_KEY);
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-      } catch (e) {}
-    }
-    return NextResponse.next();
-  }
-
-  // 3. Protect all other /admin routes
-  if (pathname.startsWith('/admin')) {
+  // 3. Protect all other /admin routes (/admin/dashboard, /admin/forums, etc.)
+  if (pathname.startsWith('/admin/')) {
     const token = request.cookies.get('apc_congress_session')?.value;
 
     if (!token) {
@@ -48,7 +45,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     } catch (err) {
       const loginUrl = new URL('/admin/login', request.url);
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      res.cookies.delete('apc_congress_session');
+      return res;
     }
   }
 

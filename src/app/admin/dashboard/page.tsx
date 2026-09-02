@@ -14,9 +14,18 @@ import {
   MapPin
 } from 'lucide-react';
 
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Dynamic server page
 
 export default async function AdminDashboardPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   // 1. Fetch Aggregated Counts
   const total = await prisma.forum.count();
   const submitted = await prisma.forum.count({ where: { status: 'submitted' } });

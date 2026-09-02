@@ -12,11 +12,19 @@ import {
   MapPin,
   Calendar
 } from 'lucide-react';
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import { GoogleDriveSyncButton } from '@/components/admin/GoogleDriveSyncButton';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function AdminReportsPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   // Aggregate Stats
   const totalForums = await prisma.forum.count();
   const verifiedForums = await prisma.forum.count({ where: { status: 'approved_verified' } });
