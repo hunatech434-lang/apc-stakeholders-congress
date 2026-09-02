@@ -265,11 +265,11 @@ async function main() {
   // 9. Seed Sample News
   const newsItems = [
     {
-      title: 'APC Stakeholders Congress Accelerates Grassroots Mobilization in Kwara State',
-      slug: 'apc-stakeholders-congress-accelerates-grassroots-mobilization',
-      excerpt: 'Stakeholders and party leaders convene at the State Secretariat on Fate Road, Ilorin, reaffirming unity and party supremacy.',
-      body: 'The APC Stakeholders Congress Kwara State Chapter has commenced the formal integration and digital registration of all affiliated associations and support groups. The initiative aims to harmonize grassroots structures ahead of 2027.',
-      category: 'Mobilization',
+      title: 'NOTICE OF INAUGURATION',
+      slug: 'notice-of-inauguration',
+      excerpt: 'This is to formally notify all duly registered Support Groups and Forums that the Inauguration Ceremony for APC Support Groups ahead of the 2027 General Elections is coming up soon.',
+      body: 'This is to formally notify all duly registered Support Groups and Forums that the Inauguration Ceremony for APC Support Groups ahead of the 2027 General Elections is coming up SOON.\n\nThe date will be communicated to all coordinators in due course.\n\nAll coordinators are advised to:\n1. Ensure their group members are mobilized and prepared\n2. Keep communication lines open for further directives\n3. Submit any pending details via the registration portal\n\nNote: Only registered groups will be inaugurated and carried along in party activities.',
+      category: 'Press Release',
       status: 'published',
       authorId: adminUser.id,
     },
