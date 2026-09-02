@@ -1,14 +1,33 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Users, FileText, HeartHandshake, ShieldCheck, ChevronRight, Phone } from 'lucide-react';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Get Involved | Grassroots Mobilization for Victory 2027',
+  description:
+    'Join active APC stakeholders, grassroots canvassers, youth coordinators, and women groups driving party victory in Kwara State for 2027.',
+  canonicalPath: '/get-involved',
+  keywords: [
+    'APC grassroots mobilization Kwara',
+    'join APC support group',
+    'APC volunteer Kwara',
+    'Victory 2027 APC participation',
+  ],
+});
 
 export default function GetInvolvedPage() {
   return (
-    <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
+    <div className="bg-slate-50 min-h-screen py-10 lg:py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ name: 'Get Involved', path: '/get-involved' }]} />
+
         {/* Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
             <span className="w-1.5 h-1.5 rounded-full bg-apcRed-500"></span>
             Stakeholder Participation
           </div>

@@ -10,7 +10,6 @@ interface AdminUserItem {
   fullName: string;
   roleId: string;
   roleName: string;
-  phoneNumber?: string | null;
   isActive: boolean;
   lastLoginAt?: string | null;
 }
@@ -99,7 +98,6 @@ export function AdminUserTable({ initialUsers }: { initialUsers: AdminUserItem[]
               <tr>
                 <th className="py-3.5 px-4">Administrator</th>
                 <th className="py-3.5 px-4">Role & Permissions</th>
-                <th className="py-3.5 px-4">Contact Phone</th>
                 <th className="py-3.5 px-4">Status</th>
                 <th className="py-3.5 px-4 text-right">Access Control Action</th>
               </tr>
@@ -120,9 +118,6 @@ export function AdminUserTable({ initialUsers }: { initialUsers: AdminUserItem[]
                         {u.roleId === 'reporting_viewer' && 'View all registrations and download full Excel & CSV registry.'}
                         {u.roleId === 'content_editor' && 'Manage News, Announcements, Gallery and view/export registry.'}
                       </div>
-                    </td>
-                    <td className="py-4 px-4 font-mono text-slate-300">
-                      {u.phoneNumber || '—'}
                     </td>
                     <td className="py-4 px-4">
                       {u.isActive ? (

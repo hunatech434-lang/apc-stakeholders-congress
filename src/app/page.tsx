@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from 'next';
 import { 
   FileText, 
   Search, 
@@ -21,9 +22,40 @@ import {
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import HeroCarousel from '@/components/home/HeroCarousel';
+import { buildMetadata, slugify } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = buildMetadata({
+  title: 'APC Stakeholders Congress | Kwara State',
+  description:
+    'APC Stakeholders Congress is a platform for APC forums, associations and support groups in Kwara State to register, connect and coordinate grassroots engagement.',
+  canonicalPath: '/',
+  keywords: [
+    'APC Stakeholders Congress',
+    'APC Stakeholders Congress Kwara',
+    'APC forums in Kwara',
+    'APC support groups in Kwara',
+    'APC associations in Kwara',
+    'register APC forum',
+    'register APC association',
+    'APC forum registration',
+    'APC support group registration',
+    'verified APC groups',
+    'APC groups in Kwara',
+    'APC grassroots groups',
+    'APC stakeholders Kwara',
+    'APC stakeholders registration',
+    'APC forum verification',
+    'APC forums Ilorin',
+    'APC groups in Ilorin',
+    'APC Kwara North',
+    'APC Kwara Central',
+    'APC Kwara South',
+    'Victory 2027',
+  ],
+});
 
 export default async function HomePage() {
   // Fetch real statistics & recent verified groups
@@ -76,11 +108,11 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* 1. HERO SECTION WITH IMAGE CAROUSEL */}
+      {/* 1. HERO SECTION WITH IMAGE CAROUSEL (Contains single primary H1) */}
       <HeroCarousel />
 
       {/* 2. REAL-TIME STATS & GRASSROOTS IMPACT BANNER */}
-      <section className="bg-brand-900 text-white py-6 sm:py-8 border-y border-brand-800">
+      <section aria-label="Key Portal Statistics" className="bg-brand-900 text-white py-6 sm:py-8 border-y border-brand-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
             <div className="p-2 sm:p-3">
@@ -115,7 +147,7 @@ export default async function HomePage() {
       </section>
 
       {/* 3. WHO WE ARE & PURPOSE (EXACT APPROVED FRAMING) */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section aria-labelledby="about-section-heading" className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             <div className="lg:col-span-7 space-y-5 sm:space-y-6">
@@ -124,7 +156,7 @@ export default async function HomePage() {
                 Official Mandate
               </div>
               
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              <h2 id="about-section-heading" className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 About APC Stakeholders Congress, Kwara State
               </h2>
 
@@ -205,7 +237,7 @@ export default async function HomePage() {
                   href="/register"
                   className="w-full py-3 bg-brand-700 hover:bg-brand-600 hover:ring-2 hover:ring-apcRed-500/30 text-white font-bold rounded-xl text-center block text-xs sm:text-sm transition shadow-sm"
                 >
-                  Start Forum Registration Now
+                  Register Your Forum Now
                 </Link>
               </div>
             </div>
@@ -213,12 +245,87 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. GEOGRAPHIC COVERAGE (16 LGAs OF KWARA) */}
-      <section className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
+      {/* 4. VERIFIED FORUMS DIRECTORY PREVIEW (DISCOVERY INTENT) */}
+      {verifiedGroups.length > 0 && (
+        <section aria-labelledby="verified-groups-heading" className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Official Directory</span>
+                <h2 id="verified-groups-heading" className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+                  Recently Accredited APC Forums & Groups
+                </h2>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1">
+                  Discover officially recognized grassroots associations working across Kwara State.
+                </p>
+              </div>
+              <Link
+                href="/verified-groups"
+                className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-brand-700 hover:text-brand-800 hover:underline"
+              >
+                <span>Browse All Verified Groups in Kwara</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+              {verifiedGroups.map((group) => {
+                const groupSlug = slugify(group.name);
+                return (
+                  <div
+                    key={group.id}
+                    className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition space-y-3 flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+                          {group.lga?.name || 'Kwara'} LGA
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Accredited
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900 leading-snug">
+                        {group.name}
+                      </h3>
+                      {group.motto && (
+                        <p className="text-xs text-slate-500 italic">"{group.motto}"</p>
+                      )}
+                      <div className="text-xs text-slate-600 space-y-1 pt-1">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Coverage: {group.areaOfCoverage}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Declared Force: {group.totalStrength.toLocaleString()} members</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100">
+                      <Link
+                        href={`/verified-groups/${groupSlug}`}
+                        className="text-xs font-bold text-brand-700 hover:text-brand-800 flex items-center justify-between group"
+                      >
+                        <span>View Verified Public Profile</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5. GEOGRAPHIC COVERAGE (16 LGAs OF KWARA) */}
+      <section aria-labelledby="jurisdiction-heading" className="py-14 sm:py-20 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Jurisdiction & Scope</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+            <h2 id="jurisdiction-heading" className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
               Grassroots Reach Across Kwara State
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm mt-1.5">
@@ -240,12 +347,13 @@ export default async function HomePage() {
                 </div>
                 <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {dist.lgas.map((lga) => (
-                    <span
+                    <Link
                       key={lga}
-                      className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200"
+                      href={`/verified-groups?lga=${encodeURIComponent(lga)}`}
+                      className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 hover:bg-brand-50 hover:text-brand-800 text-slate-800 border border-slate-200 transition"
                     >
                       {lga}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -258,15 +366,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-
-
       {/* 6. LATEST ANNOUNCEMENTS & NEWS */}
       {announcements.length > 0 && (
-        <section className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
+        <section aria-labelledby="notices-heading" className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
               <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Official Notices</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Announcements & Updates</h2>
+              <h2 id="notices-heading" className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Announcements & Updates</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
@@ -286,14 +392,24 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-8 text-center">
+              <Link
+                href="/news"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-700 hover:text-brand-800 hover:underline"
+              >
+                <span>Read Full Directorate Press Releases & News</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </section>
       )}
 
       {/* 7. CALL TO ACTION STRIP */}
-      <section className="py-14 sm:py-20 bg-gradient-to-br from-brand-900 via-slate-950 to-brand-950 text-white border-t-2 border-apcRed-500">
+      <section aria-labelledby="cta-heading" className="py-14 sm:py-20 bg-gradient-to-br from-brand-900 via-slate-950 to-brand-950 text-white border-t-2 border-apcRed-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-6">
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+          <h2 id="cta-heading" className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Ready to Accredit Your APC Support Group?
           </h2>
           <p className="text-brand-100 text-xs sm:text-base max-w-2xl mx-auto">
@@ -310,7 +426,7 @@ export default async function HomePage() {
               href="/status"
               className="w-full sm:w-auto px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 transition text-xs sm:text-sm"
             >
-              Check Existing Status
+              Check Existing Registration Status
             </Link>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { 
@@ -14,8 +15,23 @@ import {
   FileText,
   ArrowRight
 } from 'lucide-react';
+import { buildMetadata } from '@/lib/seo';
 
 export const revalidate = 0;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}): Promise<Metadata> {
+  const { token } = await params;
+  return buildMetadata({
+    title: 'Document Verification',
+    description: 'Official document authenticity and verification portal.',
+    canonicalPath: `/verify/${token}`,
+    noIndex: true,
+  });
+}
 
 export default async function VerifyDocumentPage({
   params,

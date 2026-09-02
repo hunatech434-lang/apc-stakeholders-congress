@@ -1,6 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { 
   Search, 
   ShieldCheck, 
@@ -16,8 +17,16 @@ import {
   ArrowRight,
   FileText
 } from 'lucide-react';
+import { buildMetadata } from '@/lib/seo';
 
 export const revalidate = 0;
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Check Forum Registration Status',
+  description: 'Lookup registration status and retrieve official accreditation documents.',
+  canonicalPath: '/status',
+  noIndex: true,
+});
 
 export default async function StatusPage({
   searchParams,

@@ -7,9 +7,11 @@ import {
   MapPin, 
   Phone, 
   Mail, 
-  ChevronRight,
-  Lock
+  ChevronRight, 
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
+import { SITE_CONFIG } from '@/lib/seo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -34,22 +36,22 @@ export default function Footer() {
               <div className="w-11 h-11 bg-white rounded-xl p-1 flex-shrink-0 flex items-center justify-center shadow-sm">
                 <Image
                   src="/images/official-logo.png"
-                  alt="APC Stakeholders Congress Logo"
+                  alt="APC Stakeholders Congress Official Emblem"
                   width={42}
                   height={42}
                   className="object-contain"
                 />
               </div>
               <div>
-                <h4 className="font-bold text-white text-sm tracking-tight leading-tight">
-                  APC Stakeholders Congress
-                </h4>
-                <p className="text-[11px] text-slate-400 font-medium">Kwara State Chapter</p>
+                <span className="font-bold text-white text-sm tracking-tight leading-tight block">
+                  {SITE_CONFIG.name}
+                </span>
+                <p className="text-[11px] text-slate-400 font-medium">{SITE_CONFIG.chapterName}</p>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              The centralized digital registry, verification and accreditation platform for APC support groups united for victory 2027
+              The centralized digital registry, verification and accreditation platform for APC support groups united for victory 2027.
             </p>
 
             {/* Secondary APC National Affiliation Badge */}
@@ -57,7 +59,7 @@ export default function Footer() {
               <div className="w-6 h-6 relative flex-shrink-0">
                 <Image
                   src="/images/apc-national-logo.png"
-                  alt="APC Party Logo"
+                  alt="All Progressives Congress National Logo"
                   width={24}
                   height={24}
                   className="object-contain"
@@ -72,13 +74,18 @@ export default function Footer() {
 
           {/* Col 2: Registry & Portal */}
           <div>
-            <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-gold-500 pl-2">
+            <span className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-gold-500 pl-2 block">
               Registry & Portal
-            </h5>
+            </span>
             <ul className="space-y-2.5 text-xs">
               <li>
                 <Link href="/register" className="hover:text-white transition flex items-center gap-1.5 text-brand-400 font-medium">
                   <ChevronRight className="w-3 h-3 text-gold-500" /> Register Forum
+                </Link>
+              </li>
+              <li>
+                <Link href="/verified-groups" className="hover:text-white transition flex items-center gap-1.5 text-slate-300 font-medium">
+                  <ChevronRight className="w-3 h-3 text-brand-500" /> Browse Verified Groups
                 </Link>
               </li>
               <li>
@@ -93,17 +100,17 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/get-involved" className="hover:text-white transition flex items-center gap-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-600" /> Get Involved
+                  <ChevronRight className="w-3 h-3 text-slate-600" /> Get Involved in Victory 2027
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Media & Gallery */}
+          {/* Col 3: Media & Information */}
           <div>
-            <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-brand-500 pl-2">
-              Media & Gallery
-            </h5>
+            <span className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-brand-500 pl-2 block">
+              Media & Information
+            </span>
             <ul className="space-y-2.5 text-xs">
               <li>
                 <Link href="/news" className="hover:text-white transition flex items-center gap-1.5">
@@ -117,7 +124,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/contact" className="hover:text-white transition flex items-center gap-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-600" /> Contact Secretariat
+                  <ChevronRight className="w-3 h-3 text-slate-600" /> Contact State Secretariat
                 </Link>
               </li>
               <li>
@@ -127,30 +134,30 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/terms" className="hover:text-white transition flex items-center gap-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-600" /> Terms of Registration
+                  <ChevronRight className="w-3 h-3 text-slate-600" /> Terms of Accreditation
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Secretariat Contact */}
+          {/* Col 4: Secretariat Contact (Standardized with Local SEO) */}
           <div>
-            <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-apcRed-500 pl-2">
+            <span className="text-xs font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-apcRed-500 pl-2 block">
               State Secretariat
-            </h5>
+            </span>
             <ul className="space-y-3 text-xs text-slate-400">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-brand-400 flex-shrink-0 mt-0.5" />
-                <span>APC Kwara North House, Fate Road, Ilorin, Kwara State, Nigeria</span>
+                <span>{SITE_CONFIG.secretariatAddress.streetAddress}, {SITE_CONFIG.secretariatAddress.addressLocality}, {SITE_CONFIG.secretariatAddress.addressRegion}, Nigeria</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <span>07030592380, 08032010479, 07031693124</span>
+                <span>{SITE_CONFIG.contact.displayPhones}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                <a href="mailto:apcstakeholderscongress@gmail.com" className="hover:underline text-slate-300">
-                  apcstakeholderscongress@gmail.com
+                <a href={`mailto:${SITE_CONFIG.contact.email}`} className="hover:underline text-slate-300">
+                  {SITE_CONFIG.contact.email}
                 </a>
               </li>
             </ul>

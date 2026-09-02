@@ -5,18 +5,63 @@ import {
   Mail, 
   Clock, 
   ShieldCheck,
-  Send
+  Send,
+  Building
 } from 'lucide-react';
+import type { Metadata } from 'next';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+import JsonLd from '@/components/seo/JsonLd';
+import { buildMetadata, SITE_CONFIG } from '@/lib/seo';
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Contact State Secretariat | APC Stakeholders Congress Kwara',
+  description:
+    'Contact the official APC Stakeholders Congress State Directorate at Fate Road, Ilorin, Kwara State. Inquiries on forum registration, document verification, and stakeholder appointments.',
+  canonicalPath: '/contact',
+  keywords: [
+    'APC Kwara secretariat address',
+    'APC Stakeholders Congress office',
+    'APC Fate Road Ilorin',
+    'APC Kwara phone numbers',
+    'APC support group enquiries Kwara',
+  ],
+});
 
 export default function ContactPage() {
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    mainEntity: {
+      '@type': 'LocalBusiness',
+      name: SITE_CONFIG.name,
+      image: `${SITE_CONFIG.canonicalDomain}${SITE_CONFIG.images.ogDefault}`,
+      telephone: SITE_CONFIG.contact.phones[0],
+      email: SITE_CONFIG.contact.email,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: SITE_CONFIG.secretariatAddress.streetAddress,
+        addressLocality: SITE_CONFIG.secretariatAddress.addressLocality,
+        addressRegion: SITE_CONFIG.secretariatAddress.addressRegion,
+        postalCode: SITE_CONFIG.secretariatAddress.postalCode,
+        addressCountry: SITE_CONFIG.secretariatAddress.addressCountry,
+      },
+      openingHours: SITE_CONFIG.contact.officeHours,
+    },
+  };
+
   return (
-    <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <div className="bg-slate-50 min-h-screen py-10 lg:py-16">
+      <JsonLd data={contactSchema} />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ name: 'Contact Secretariat', path: '/contact' }]} />
+
         {/* Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
             <span className="w-1.5 h-1.5 rounded-full bg-apcRed-500"></span>
-            State Secretariat
+            State Secretariat & Directorate
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Contact the Directorate
@@ -42,7 +87,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-slate-900">Physical Secretariat</h3>
                     <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                      APC Kwara North House, Fate Road, Ilorin, Kwara State, Nigeria.
+                      {SITE_CONFIG.secretariatAddress.streetAddress}, {SITE_CONFIG.secretariatAddress.addressLocality}, {SITE_CONFIG.secretariatAddress.addressRegion}, Nigeria.
                     </p>
                   </div>
                 </div>
@@ -54,7 +99,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-slate-900">Telephone Lines</h3>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      07030592380 • 08032010479 • 07031693124
+                      {SITE_CONFIG.contact.displayPhones}
                     </p>
                   </div>
                 </div>
@@ -66,8 +111,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-bold text-slate-900">Official Email</h3>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      <a href="mailto:apcstakeholderscongress@gmail.com" className="text-brand-700 hover:underline">
-                        apcstakeholderscongress@gmail.com
+                      <a href={`mailto:${SITE_CONFIG.contact.email}`} className="text-brand-700 hover:underline">
+                        {SITE_CONFIG.contact.email}
                       </a>
                     </p>
                   </div>

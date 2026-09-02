@@ -4,11 +4,32 @@ import { getSession } from '@/lib/auth';
 import { logAudit } from '@/lib/auditLogger';
 import * as XLSX from 'xlsx';
 
+/**
+ * Neutralizes Spreadsheet Formula Injection (CWE-1236)
+ * Prevents execution of malicious formulas in Excel/CSV by prefixing unsafe leading characters.
+ */
+function sanitizeCell(value: any): any {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return '';
+  // Check for dangerous formula starters: =, +, -, @, \t, \r, %
+  if (/^[=+\-@\t\r%]/.test(trimmed)) {
+    return `'${trimmed}`;
+  }
+  return trimmed;
+}
+
 export async function GET(request: Request) {
   try {
     const session = await getSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: Directorate login required' }, { status: 401 });
+    }
+
+    // Role check: Only Super Admin, DG (Reporting Viewer), and Media & Ops can export
+    const allowedRoles = ['super_admin', 'state_admin', 'reporting_viewer', 'content_editor'];
+    if (!allowedRoles.includes(session.roleId)) {
+      return NextResponse.json({ error: 'Forbidden: Insufficient privileges for data export' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -28,30 +49,28 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Format data cleanly
+    // Format data with strict formula injection defense
     const exportData = forums.map((f, idx) => ({
       'S/N': idx + 1,
-      'Registration Ref': f.registrationRef,
-      'Forum Name': f.name,
-      'Motto': f.motto || 'N/A',
+      'Registration Ref': sanitizeCell(f.registrationRef),
+      'Forum Name': sanitizeCell(f.name),
       'Year Established': f.yearEstablished,
-      'Area of Coverage': f.areaOfCoverage,
-      'LGA': f.lga?.name || 'Kwara',
-      'Ward / Focus': f.wardName || 'All Wards',
-      'Office Address': f.officeAddress,
-      'Coordinator Name': f.coordinatorName,
-      'Coordinator Phone': f.coordinatorPhone,
-      'Secretary Name': f.secretaryName,
-      'Secretary Phone': f.secretaryPhone,
-      'Official Forum Email': f.forumEmail || 'N/A',
+      'Area of Coverage': sanitizeCell(f.areaOfCoverage),
+      'LGA': sanitizeCell(f.lga?.name || 'Kwara State'),
+      'Office Address': sanitizeCell(f.officeAddress || 'N/A'),
+      'Coordinator Name': sanitizeCell(f.coordinatorName),
+      'Coordinator Phone': sanitizeCell(f.coordinatorPhone),
+      'Secretary Name': sanitizeCell(f.secretaryName),
+      'Secretary Phone': sanitizeCell(f.secretaryPhone),
+      'Official Forum Email': sanitizeCell(f.forumEmail || 'N/A'),
       'Declared Member Strength': f.totalStrength,
-      'Capacity Details': f.additionalCapacityInfo || 'N/A',
-      'Previous Election Activity': f.previousElectionActivity,
-      'Status': f.status.toUpperCase(),
-      'Registration Date': f.submittedAt ? new Date(f.submittedAt).toLocaleDateString('en-GB') : new Date(f.createdAt).toLocaleDateString('en-GB'),
+      'Status': sanitizeCell(f.status.toUpperCase()),
+      'Registration Date': f.submittedAt 
+        ? new Date(f.submittedAt).toLocaleDateString('en-GB') 
+        : new Date(f.createdAt).toLocaleDateString('en-GB'),
     }));
 
-    // Log export event to audit trail
+    // Log export event to immutable audit trail
     await logAudit({
       actorId: session.userId,
       actorEmail: session.email,
@@ -73,6 +92,7 @@ export async function GET(request: Request) {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="APC_Stakeholders_Registry_${new Date().toISOString().slice(0, 10)}.csv"`,
+          'Cache-Control': 'no-store, max-age=0',
         },
       });
     }
@@ -83,14 +103,15 @@ export async function GET(request: Request) {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Registered Forums');
     const xlsxBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-    return new NextResponse(xlsxBuffer, {
+    return new NextResponse(new Uint8Array(xlsxBuffer), {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename="APC_Stakeholders_Registry_${new Date().toISOString().slice(0, 10)}.xlsx"`,
+        'Cache-Control': 'no-store, max-age=0',
       },
     });
   } catch (error) {
     console.error('Export error:', error);
-    return NextResponse.json({ error: 'Failed to generate export file' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate export file safely' }, { status: 500 });
   }
 }

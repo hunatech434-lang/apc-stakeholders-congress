@@ -198,33 +198,64 @@ async function main() {
     });
   }
 
-  // 7. Default Administrator Users
-  const defaultPassword = await bcrypt.hash('ApcCongress2027!', 10);
+  // 7. Designated Administrator Users (Only 3 authorized logins)
+  const passKahuna = await bcrypt.hash('Kahuna@Apc2027#State', 10);
+  const passDg = await bcrypt.hash('DgAkande@Apc2027#Kwara', 10);
+  const passArewa = await bcrypt.hash('ArewaMedia@Apc2027#Kw', 10);
 
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@apcstakeholderscongress.ng' },
-    update: {},
+    where: { email: '33kahuna@apcstakeholderscongress.ng' },
+    update: {
+      fullName: '33kahuna (State Administrator)',
+      roleId: 'super_admin',
+      phoneNumber: null,
+      isActive: true,
+    },
     create: {
-      email: 'admin@apcstakeholderscongress.ng',
-      passwordHash: defaultPassword,
-      fullName: 'Chief Administrative Officer',
-      phoneNumber: '07030592380',
+      email: '33kahuna@apcstakeholderscongress.ng',
+      passwordHash: passKahuna,
+      fullName: '33kahuna (State Administrator)',
       roleId: 'super_admin',
       stateId: kwaraState.id,
+      phoneNumber: null,
       isActive: true,
     },
   });
 
   await prisma.user.upsert({
-    where: { email: 'verifier@apcstakeholderscongress.ng' },
-    update: {},
+    where: { email: 'dghakeem@apcstakeholderscongress.ng' },
+    update: {
+      fullName: 'Dr. Hakeem Babalola Akande (Director General)',
+      roleId: 'reporting_viewer',
+      phoneNumber: null,
+      isActive: true,
+    },
     create: {
-      email: 'verifier@apcstakeholderscongress.ng',
-      passwordHash: defaultPassword,
-      fullName: 'Lead Verification Officer',
-      phoneNumber: '08032010479',
-      roleId: 'verification_officer',
+      email: 'dghakeem@apcstakeholderscongress.ng',
+      passwordHash: passDg,
+      fullName: 'Dr. Hakeem Babalola Akande (Director General)',
+      roleId: 'reporting_viewer',
       stateId: kwaraState.id,
+      phoneNumber: null,
+      isActive: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'apcscarewa@apcstakeholderscongress.ng' },
+    update: {
+      fullName: 'APCSC Arewa (Media & Operations)',
+      roleId: 'content_editor',
+      phoneNumber: null,
+      isActive: true,
+    },
+    create: {
+      email: 'apcscarewa@apcstakeholderscongress.ng',
+      passwordHash: passArewa,
+      fullName: 'APCSC Arewa (Media & Operations)',
+      roleId: 'content_editor',
+      stateId: kwaraState.id,
+      phoneNumber: null,
       isActive: true,
     },
   });

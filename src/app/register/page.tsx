@@ -1,20 +1,36 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import RegistrationWizard from '@/components/registration/RegistrationWizard';
 import { ShieldCheck, Info } from 'lucide-react';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+import { buildMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Register Your Forum | APC Stakeholders Congress',
-  description: 'Official digital accreditation and registration portal for APC forums, associations, and support groups in Kwara State.',
-};
+export const metadata: Metadata = buildMetadata({
+  title: 'Register Your Forum | APC Stakeholders Congress Kwara',
+  description:
+    'Official online accreditation and registration portal for APC forums, associations, and support groups in Kwara State. Obtain an official Letter of Recognition.',
+  canonicalPath: '/register',
+  keywords: [
+    'register APC forum',
+    'register APC association',
+    'APC forum registration',
+    'APC support group registration',
+    'register APC forum in Kwara',
+    'APC stakeholders registration',
+  ],
+});
 
 export default function RegisterPage() {
   return (
     <div className="bg-slate-50 min-h-screen py-10 lg:py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ name: 'Register Forum', path: '/register' }]} />
+
         {/* Header Title */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
-            <ShieldCheck className="w-3.5 h-3.5" /> Official Accreditation Portal
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
+            <ShieldCheck className="w-3.5 h-3.5 text-brand-700" /> Official Accreditation Portal
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Forum & Support Group Registration

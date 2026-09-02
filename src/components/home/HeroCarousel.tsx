@@ -61,10 +61,11 @@ export default function HeroCarousel() {
           >
             <Image
               src={src}
-              alt="APC Stakeholders Congress Kwara Rally"
+              alt={`APC Stakeholders Congress Kwara grassroots mobilization rally - photo ${idx + 1}`}
               fill
               priority={idx === 0}
               className="object-cover object-center"
+              sizes="100vw"
             />
           </div>
         ))}
@@ -85,14 +86,14 @@ export default function HeroCarousel() {
             <span className="text-slate-300">Official Stakeholder Registry</span>
           </div>
 
-          {/* Main Headline with APC Light Blue Accent */}
+          {/* Main Headline with APC Light Blue Accent - Exactly One Primary H1 */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
             UNITING APC STAKEHOLDERS FOR <span className="text-sky-400">VICTORY 2027</span>
           </h1>
 
           {/* Supporting Copy */}
           <p className="text-sm sm:text-lg text-slate-100 leading-relaxed font-normal max-w-2xl drop-shadow">
-            The official centralized platform for APC forums, associations, and support groups in Kwara State to register, obtain official accreditation, connect with party leadership, and mobilize for resounding victory.
+            The official centralized platform for APC forums, associations, and support groups in Kwara State to register, obtain official accreditation, connect with party leadership, and coordinate grassroots engagement.
           </p>
 
           {/* Primary Action Buttons */}
@@ -106,11 +107,11 @@ export default function HeroCarousel() {
             </Link>
 
             <Link
-              href="/status"
+              href="/verified-groups"
               className="px-6 py-3.5 bg-slate-900/80 hover:bg-slate-800/90 active:bg-slate-950 backdrop-blur text-white font-semibold rounded-xl border border-white/20 hover:border-sky-400/50 transition text-center flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
-              Check Registration Status
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
+              Browse Verified Forums
             </Link>
           </div>
 

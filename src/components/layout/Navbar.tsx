@@ -10,6 +10,8 @@ import {
   ChevronRight, 
   FileText, 
   Search, 
+  ShieldCheck,
+  Calendar,
   Lock
 } from 'lucide-react';
 
@@ -20,7 +22,9 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
+    { name: 'Verified Groups', href: '/verified-groups' },
     { name: 'News', href: '/news' },
+    { name: 'Events', href: '/events-gallery' },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -82,13 +86,13 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Links with APC National Logo Affiliation Badge right before Home */}
-          <nav className="hidden lg:flex items-center gap-1.5">
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center gap-1">
             {/* APC National Party Logo displayed right before Home */}
             <div className="flex items-center gap-1.5 px-2.5 py-1.5 mr-1 rounded-xl bg-slate-100/80 border border-slate-200 text-xs font-bold text-slate-700">
               <div className="w-4 h-4 relative flex-shrink-0">
                 <Image
                   src="/images/apc-national-logo.png"
-                  alt="APC National Logo"
+                  alt="APC National Party Flag Logo"
                   width={16}
                   height={16}
                   className="object-contain"
@@ -101,7 +105,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`px-3.5 py-1.5 rounded-lg text-sm transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs xl:text-sm transition ${
                   isActive(link.href)
                     ? 'text-brand-800 font-semibold bg-brand-50/80 border-b-2 border-brand-600'
                     : 'text-slate-600 font-medium hover:text-brand-700 hover:bg-slate-50'

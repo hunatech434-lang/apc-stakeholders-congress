@@ -4,21 +4,34 @@ import Image from 'next/image';
 import { 
   ShieldCheck, 
   Target, 
-  Eye, 
-  Compass, 
-  Award, 
-  Users, 
-  CheckCircle2, 
+  Layers, 
+  Vote, 
   MapPin, 
   Phone, 
   Mail,
   ChevronRight,
-  Vote,
-  Layers,
-  Sparkles
+  UserCheck,
+  Award,
+  Users
 } from 'lucide-react';
 
 export default function AboutPage() {
+  const principalOfficers = [
+    { num: 1, title: 'Director General - DG', highlight: true },
+    { num: 2, title: 'Deputy DG (Operations)', highlight: true },
+    { num: 3, title: 'Secretary General', highlight: true },
+    { num: 4, title: 'Director of Finance' },
+    { num: 5, title: 'Director of Contact & Mobilization' },
+    { num: 6, title: 'Director of Media & Publicity' },
+    { num: 7, title: 'Director of Programme & Strategy' },
+    { num: 8, title: 'Director of Women Affairs' },
+    { num: 9, title: 'Director of Youth Affairs' },
+    { num: 10, title: 'Director of Welfare' },
+    { num: 11, title: 'Auditor' },
+    { num: 12, title: 'Ex-Officio 1' },
+    { num: 13, title: 'Ex-Officio 2' },
+  ];
+
   return (
     <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -94,6 +107,48 @@ export default function AboutPage() {
             <div className="text-sm sm:text-base font-extrabold text-brand-800 tracking-wide">
               One Party. One Structure. One Strong Grassroots Movement.
             </div>
+          </div>
+        </div>
+
+        {/* SEC STRUCTURE & PRINCIPAL OFFICERS CARD */}
+        <div className="bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-5">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-700 mb-1.5">
+              <ShieldCheck className="w-4 h-4 text-brand-600" />
+              Organizational Hierarchy
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              SEC STRUCTURE
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              State Executive Council — Principal Officers Directorate
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {principalOfficers.map((officer) => (
+              <div
+                key={officer.num}
+                className={`flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl border transition ${
+                  officer.highlight
+                    ? 'bg-brand-50/60 border-brand-200/90 shadow-sm'
+                    : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100/80'
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-xl font-mono text-xs font-extrabold flex items-center justify-center flex-shrink-0 ${
+                    officer.highlight
+                      ? 'bg-brand-700 text-white'
+                      : 'bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  {officer.num}
+                </div>
+                <div className="font-bold text-xs sm:text-sm text-slate-800 leading-snug">
+                  {officer.title}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

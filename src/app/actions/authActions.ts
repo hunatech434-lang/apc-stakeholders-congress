@@ -9,24 +9,21 @@ import { revalidatePath } from 'next/cache';
 
 const DESIGNATED_ADMINS: Record<
   string,
-  { roleId: string; fullName: string; phoneNumber: string; initialPass: string }
+  { roleId: string; fullName: string; initialPass: string }
 > = {
   '33kahuna': {
     roleId: 'super_admin',
     fullName: '33kahuna (State Administrator)',
-    phoneNumber: '07030592380',
     initialPass: 'Kahuna@Apc2027#State',
   },
   'dghakeem': {
     roleId: 'reporting_viewer',
     fullName: 'Dr. Hakeem Babalola Akande (Director General)',
-    phoneNumber: '08032010479',
     initialPass: 'DgAkande@Apc2027#Kwara',
   },
   'apcscarewa': {
     roleId: 'content_editor',
     fullName: 'APCSC Arewa (Media & Operations)',
-    phoneNumber: '07031693124',
     initialPass: 'ArewaMedia@Apc2027#Kw',
   },
 };
@@ -45,6 +42,16 @@ export async function loginAdmin(formData: FormData) {
     return {
       success: false,
       error: 'Please enter your username and password (minimum 6 characters).',
+    };
+  }
+
+  // Rate Limiting: Max 5 login attempts per minute per identifier
+  const { checkRateLimit } = await import('@/lib/rateLimit');
+  const rateLimitResult = checkRateLimit(`login_${rawUsername}`, { limit: 5, windowSeconds: 60 });
+  if (!rateLimitResult.allowed) {
+    return {
+      success: false,
+      error: `Too many login attempts. Please wait ${rateLimitResult.resetInSeconds} seconds before trying again.`,
     };
   }
 
@@ -89,7 +96,7 @@ export async function loginAdmin(formData: FormData) {
           fullName: designatedConfig.fullName,
           roleId: designatedConfig.roleId,
           passwordHash: initialHash,
-          phoneNumber: designatedConfig.phoneNumber,
+          phoneNumber: null,
           isActive: true,
         },
         include: { role: true },

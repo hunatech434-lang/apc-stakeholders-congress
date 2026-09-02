@@ -27,7 +27,6 @@ export default async function AdminUsersPage() {
     fullName: u.fullName,
     roleId: u.roleId,
     roleName: u.role.name,
-    phoneNumber: u.phoneNumber,
     isActive: u.isActive,
     lastLoginAt: u.lastLoginAt ? u.lastLoginAt.toISOString() : null,
   }));

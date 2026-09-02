@@ -1,6 +1,15 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getSession } from '@/lib/auth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Directorate Administrative Portal',
+  description: 'Authorized administrative access for APC Stakeholders Congress officers.',
+  canonicalPath: '/admin',
+  noIndex: true,
+});
 
 export default async function AdminLayout({
   children,
