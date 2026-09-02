@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
           '/',
           '/about',
           '/register',
-          '/verified-groups',
           '/news',
           '/events-gallery',
           '/get-involved',

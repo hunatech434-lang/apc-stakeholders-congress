@@ -36,9 +36,9 @@ export default function NotFound() {
       color: 'text-sky-600 bg-sky-50 border-sky-200',
     },
     {
-      title: 'Verified Groups Directory',
-      desc: 'Browse accredited APC forums across the 16 LGAs of Kwara.',
-      href: '/verified-groups',
+      title: 'Check Accreditation Status',
+      desc: 'Verify the registration status of your submitted support group.',
+      href: '/status',
       icon: ShieldCheck,
       color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
     },

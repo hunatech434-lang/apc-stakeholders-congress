@@ -107,11 +107,11 @@ export default function HeroCarousel() {
             </Link>
 
             <Link
-              href="/verified-groups"
+              href="/status"
               className="px-6 py-3.5 bg-slate-900/80 hover:bg-slate-800/90 active:bg-slate-950 backdrop-blur text-white font-semibold rounded-xl border border-white/20 hover:border-sky-400/50 transition text-center flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
-              Browse Verified Forums
+              Check Status
             </Link>
           </div>
 

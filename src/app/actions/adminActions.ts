@@ -71,7 +71,6 @@ export async function updateForumStatus(
     revalidatePath(`/admin/forums/${forumId}`);
     revalidatePath('/admin/forums');
     revalidatePath('/admin/dashboard');
-    revalidatePath('/verified-groups');
     revalidatePath('/status');
 
     return { success: true };
