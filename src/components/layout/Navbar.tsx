@@ -22,7 +22,6 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
-    { name: 'Verified Groups', href: '/verified-groups' },
     { name: 'News', href: '/news' },
     { name: 'Events', href: '/events-gallery' },
     { name: 'Contact', href: '/contact' },

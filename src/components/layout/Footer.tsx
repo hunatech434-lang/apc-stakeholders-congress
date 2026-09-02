@@ -84,11 +84,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/verified-groups" className="hover:text-white transition flex items-center gap-1.5 text-slate-300 font-medium">
-                  <ChevronRight className="w-3 h-3 text-brand-500" /> Browse Verified Groups
-                </Link>
-              </li>
-              <li>
                 <Link href="/status" className="hover:text-white transition flex items-center gap-1.5">
                   <ChevronRight className="w-3 h-3 text-slate-600" /> Check Registration Status
                 </Link>

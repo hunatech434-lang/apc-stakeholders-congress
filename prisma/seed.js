@@ -260,28 +260,7 @@ async function main() {
     },
   });
 
-  // 8. Seed Sample Announcements
-  const announcements = [
-    {
-      title: 'Official Launch of Kwara State Stakeholders Registry',
-      body: 'All APC-aligned forums, support groups, and grassroots associations across the 16 LGAs of Kwara State are invited to complete their formal registration for party harmonization and 2027 victory preparation.',
-      targetAudience: 'all',
-      status: 'published',
-    },
-    {
-      title: 'Registration Verification Protocol & Document Issuance',
-      body: 'Verified groups will automatically receive official digitally signed Certificates of Registration and Letters of Recognition upon completion of verification by the State Directorate.',
-      targetAudience: 'registered_forums',
-      status: 'published',
-    },
-  ];
 
-  for (const ann of announcements) {
-    const existing = await prisma.announcement.findFirst({ where: { title: ann.title } });
-    if (!existing) {
-      await prisma.announcement.create({ data: ann });
-    }
-  }
 
   // 9. Seed Sample News
   const newsItems = [
