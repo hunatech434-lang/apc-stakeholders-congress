@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import VerificationControls from '@/components/admin/VerificationControls';
 import { 
@@ -16,9 +15,12 @@ import {
   Building,
   Clock,
   History,
-  Download
+  Download,
 } from 'lucide-react';
+import { getSession } from '@/lib/auth';
+import { notFound, redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function ForumDetailPage({
@@ -26,6 +28,11 @@ export default async function ForumDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   const { id } = await params;
 
   const forum = await prisma.forum.findUnique({

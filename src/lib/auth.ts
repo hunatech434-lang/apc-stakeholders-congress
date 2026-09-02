@@ -3,7 +3,8 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'apc-stakeholders-congress-jwt-secret-kwara-2026-prod-secure-key'
+  process.env.JWT_SECRET ||
+    'nY1Y3Fyux3JFcpQQb9g1GJNkWkEJIToS+t39YBVTItKenK/hY2BVWufPyszQNdEkfqf5U3mLfVdSkJLu0q6RSQ=='
 );
 
 const SESSION_COOKIE_NAME = 'apc_congress_session';
