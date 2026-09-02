@@ -58,29 +58,9 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function HomePage() {
-  // Fetch real statistics & recent verified groups
-  let verifiedCount = 0;
-  let totalDeclaredMembers = 0;
-  let verifiedGroups: any[] = [];
   let announcements: any[] = [];
 
   try {
-    const verified = await prisma.forum.findMany({
-      where: { status: 'approved_verified' },
-      take: 6,
-      orderBy: { approvedAt: 'desc' },
-      include: { lga: true },
-    });
-    verifiedGroups = verified;
-    verifiedCount = await prisma.forum.count({
-      where: { status: 'approved_verified' },
-    });
-
-    const memberSum = await prisma.forum.aggregate({
-      _sum: { totalStrength: true },
-    });
-    totalDeclaredMembers = memberSum._sum.totalStrength || 0;
-
     announcements = await prisma.announcement.findMany({
       where: { status: 'published' },
       take: 3,
@@ -111,7 +91,7 @@ export default async function HomePage() {
       {/* 1. HERO SECTION WITH IMAGE CAROUSEL (Contains single primary H1) */}
       <HeroCarousel />
 
-      {/* 2. REAL-TIME STATS & GRASSROOTS IMPACT BANNER */}
+      {/* 2. INSTITUTIONAL COVERAGE & GRASSROOTS IMPACT BANNER */}
       <section aria-label="Key Portal Statistics" className="bg-brand-900 text-white py-6 sm:py-8 border-y border-brand-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
@@ -120,20 +100,12 @@ export default async function HomePage() {
               <div className="text-xs sm:text-sm text-brand-200 mt-0.5 font-medium">Kwara LGAs Covered</div>
             </div>
             <div className="p-2 sm:p-3">
-              <div className="text-2xl sm:text-4xl font-extrabold text-white">
-                {verifiedCount > 0 ? verifiedCount : '100%'}
-              </div>
-              <div className="text-xs sm:text-sm text-brand-200 mt-0.5 font-medium">
-                {verifiedCount > 0 ? 'Accredited Forums' : 'Digital Verification'}
-              </div>
+              <div className="text-2xl sm:text-4xl font-extrabold text-white">193</div>
+              <div className="text-xs sm:text-sm text-brand-200 mt-0.5 font-medium">Electoral Wards</div>
             </div>
             <div className="p-2 sm:p-3">
-              <div className="text-2xl sm:text-4xl font-extrabold text-sky-400">
-                {totalDeclaredMembers > 0 ? totalDeclaredMembers.toLocaleString() : '193'}
-              </div>
-              <div className="text-xs sm:text-sm text-brand-200 mt-0.5 font-medium">
-                {totalDeclaredMembers > 0 ? 'Declared Member Force' : 'Electoral Wards'}
-              </div>
+              <div className="text-2xl sm:text-4xl font-extrabold text-sky-400">100%</div>
+              <div className="text-xs sm:text-sm text-brand-200 mt-0.5 font-medium">Digital Registry & Accreditation</div>
             </div>
             <div className="p-2 sm:p-3">
               <div className="text-2xl sm:text-4xl font-extrabold text-white flex items-center justify-center gap-1.5">
@@ -245,80 +217,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. VERIFIED FORUMS DIRECTORY PREVIEW (DISCOVERY INTENT) */}
-      {verifiedGroups.length > 0 && (
-        <section aria-labelledby="verified-groups-heading" className="py-14 sm:py-20 bg-slate-50 border-t border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Official Directory</span>
-                <h2 id="verified-groups-heading" className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-                  Recently Accredited APC Forums & Groups
-                </h2>
-                <p className="text-slate-600 text-xs sm:text-sm mt-1">
-                  Discover officially recognized grassroots associations working across Kwara State.
-                </p>
-              </div>
-              <Link
-                href="/verified-groups"
-                className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-brand-700 hover:text-brand-800 hover:underline"
-              >
-                <span>Browse All Verified Groups in Kwara</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-              {verifiedGroups.map((group) => {
-                const groupSlug = slugify(group.name);
-                return (
-                  <div
-                    key={group.id}
-                    className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition space-y-3 flex flex-col justify-between"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
-                          {group.lga?.name || 'Kwara'} LGA
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Accredited
-                        </span>
-                      </div>
-                      <h3 className="text-base font-bold text-slate-900 leading-snug">
-                        {group.name}
-                      </h3>
-                      {group.motto && (
-                        <p className="text-xs text-slate-500 italic">"{group.motto}"</p>
-                      )}
-                      <div className="text-xs text-slate-600 space-y-1 pt-1">
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Coverage: {group.areaOfCoverage}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Declared Force: {group.totalStrength.toLocaleString()} members</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-100">
-                      <Link
-                        href={`/verified-groups/${groupSlug}`}
-                        className="text-xs font-bold text-brand-700 hover:text-brand-800 flex items-center justify-between group"
-                      >
-                        <span>View Verified Public Profile</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* 5. GEOGRAPHIC COVERAGE (16 LGAs OF KWARA) */}
       <section aria-labelledby="jurisdiction-heading" className="py-14 sm:py-20 bg-white border-t border-slate-200">
