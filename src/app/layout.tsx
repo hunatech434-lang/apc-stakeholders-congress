@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION || 'googlecd31dd95de5e713d',
   },
 };
 
