@@ -49,7 +49,7 @@ export default function Footer() {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              The decentralized digital registry, verification and accreditation platform for APC support groups united for victory 2027
+              The centralized digital registry, verification and accreditation platform for APC support groups united for victory 2027
             </p>
 
             {/* Secondary APC National Affiliation Badge */}
@@ -84,11 +84,6 @@ export default function Footer() {
               <li>
                 <Link href="/status" className="hover:text-white transition flex items-center gap-1.5">
                   <ChevronRight className="w-3 h-3 text-slate-600" /> Check Registration Status
-                </Link>
-              </li>
-              <li>
-                <Link href="/verified-groups" className="hover:text-white transition flex items-center gap-1.5">
-                  <ChevronRight className="w-3 h-3 text-slate-600" /> Directory of Verified Groups
                 </Link>
               </li>
               <li>

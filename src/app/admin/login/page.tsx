@@ -26,8 +26,7 @@ export default function AdminLoginPage() {
     setLoading(false);
 
     if (res.success) {
-      router.push(redirectUrl);
-      router.refresh();
+      window.location.href = redirectUrl;
     } else {
       setError(res.error || 'Login failed');
     }

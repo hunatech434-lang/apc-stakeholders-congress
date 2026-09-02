@@ -9,8 +9,32 @@ const SECRET_KEY = new TextEncoder().encode(
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only protect /admin routes excluding /admin/login
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
+  // 1. Base /admin redirect to dashboard or login
+  if (pathname === '/admin' || pathname === '/admin/') {
+    const token = request.cookies.get('apc_congress_session')?.value;
+    if (token) {
+      try {
+        await jwtVerify(token, SECRET_KEY);
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      } catch (e) {}
+    }
+    return NextResponse.redirect(new URL('/admin/login', request.url));
+  }
+
+  // 2. If user already logged in and visits /admin/login, redirect to dashboard
+  if (pathname === '/admin/login' || pathname === '/admin/login/') {
+    const token = request.cookies.get('apc_congress_session')?.value;
+    if (token) {
+      try {
+        await jwtVerify(token, SECRET_KEY);
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      } catch (e) {}
+    }
+    return NextResponse.next();
+  }
+
+  // 3. Protect all other /admin routes
+  if (pathname.startsWith('/admin')) {
     const token = request.cookies.get('apc_congress_session')?.value;
 
     if (!token) {
@@ -32,5 +56,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*'],
 };

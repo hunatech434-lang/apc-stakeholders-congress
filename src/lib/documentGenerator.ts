@@ -22,17 +22,21 @@ export interface ForumDocData {
 export async function generateLetterOfRecognitionPdf(
   forum: ForumDocData,
   verificationToken: string,
-  appUrl: string = process.env.NEXT_PUBLIC_APP_URL || 'https://apc-stakeholders-congress.vercel.app'
+  appUrl: string = process.env.NEXT_PUBLIC_APP_URL || 'https://apcstakeholderscongress.org.ng'
 ): Promise<Buffer> {
   // 1. Locate and load the official PDF template
-  const templatePath = path.join(process.cwd(), 'resources', 'APC Stakeholders Congress Letter of Recognition.pdf');
+  const primaryPath = path.join(process.cwd(), 'resources', 'APC Stakeholders Congress Letter of Recognition.pdf');
+  const fallbackPath = path.join(process.cwd(), 'public', 'templates', 'letter_template.pdf');
+  
   let templateBytes: Buffer | null = null;
   try {
-    if (fs.existsSync(templatePath)) {
-      templateBytes = fs.readFileSync(templatePath);
+    if (fs.existsSync(primaryPath)) {
+      templateBytes = fs.readFileSync(primaryPath);
+    } else if (fs.existsSync(fallbackPath)) {
+      templateBytes = fs.readFileSync(fallbackPath);
     }
   } catch (err) {
-    console.error('Failed to read official letterhead template from resources:', err);
+    console.error('Failed to read official letterhead template:', err);
   }
 
   let pdfDoc: PDFDocument;
@@ -55,7 +59,7 @@ export async function generateLetterOfRecognitionPdf(
   const darkCharcoal = rgb(0.08, 0.1, 0.12);
   const slateText = rgb(0.25, 0.3, 0.35);
 
-  // Format Date string e.g. "1st September, 2026"
+  // Format Date string e.g. "2nd September, 2026"
   const dateObj = forum.approvedAt ? new Date(forum.approvedAt) : new Date();
   const day = dateObj.getDate();
   const month = dateObj.toLocaleDateString('en-GB', { month: 'long' });
@@ -71,30 +75,23 @@ export async function generateLetterOfRecognitionPdf(
   };
   const dateStr = `${day}${nth(day)} ${month}, ${year}`;
 
-  // 1. Seamlessly cover template placeholders:
-  // Cover [DATE], [NAME OF FORUM/GROUP], [ADDRESS OF FORUM/GROUP]
+  // 1. Mask template placeholders cleanly without touching heading
   page.drawRectangle({
     x: 95,
-    y: 610,
+    y: 568,
     width: 380,
-    height: 75,
+    height: 142,
     color: rgb(1, 1, 1),
   });
 
-  // Cover "Dear Coordinator,," to replace with formatted coordinator salutation
-  page.drawRectangle({
-    x: 95,
-    y: 565,
-    width: 250,
-    height: 25,
-    color: rgb(1, 1, 1),
-  });
+  const forumName = forum.name.trim().toUpperCase();
+  const nameFontSize = forumName.length > 38 ? 10 : 11;
 
-  // 2. Draw dynamic forum details
+  // 2. Draw dynamic letter elements
   // Date
   page.drawText(dateStr, {
     x: 104,
-    y: 668,
+    y: 692,
     size: 10,
     font: fontRegular,
     color: slateText,
@@ -103,45 +100,35 @@ export async function generateLetterOfRecognitionPdf(
   // Registration Ref
   page.drawText(`Ref: ${forum.registrationRef}`, {
     x: 104,
-    y: 654,
+    y: 676,
     size: 9.5,
     font: fontBold,
     color: apcGreen,
   });
 
-  // Forum Name (Bold, Dark)
-  const forumNameUpper = forum.name.toUpperCase();
-  const nameFontSize = forumNameUpper.length > 40 ? 9.5 : 10.5;
-  page.drawText(forumNameUpper, {
+  // The Chairman/Coordinator
+  page.drawText('The Chairman/Coordinator', {
     x: 104,
-    y: 636,
+    y: 646,
+    size: 10.5,
+    font: fontRegular,
+    color: darkCharcoal,
+  });
+
+  // [NAME OF FORUM/GROUP]
+  page.drawText(forumName, {
+    x: 104,
+    y: 630,
     size: nameFontSize,
     font: fontBold,
     color: darkCharcoal,
   });
 
-  // Address & LGA / Scope
-  const addressLine = forum.officeAddress
-    ? `${forum.officeAddress} (${forum.lgaName} LGA, ${forum.areaOfCoverage})`
-    : `${forum.lgaName} LGA, ${forum.areaOfCoverage}, Kwara State`;
-  const truncatedAddress = addressLine.length > 65 ? addressLine.slice(0, 62) + '...' : addressLine;
-
-  page.drawText(truncatedAddress, {
+  // Dear Sir/Ma,
+  page.drawText('Dear Sir/Ma,', {
     x: 104,
-    y: 620,
-    size: 9,
-    font: fontRegular,
-    color: slateText,
-  });
-
-  // Salutation
-  const coordinatorGreeting = forum.coordinatorName
-    ? `Dear Coordinator (${forum.coordinatorName}),`
-    : `Dear Coordinator,`;
-  page.drawText(coordinatorGreeting, {
-    x: 104,
-    y: 572,
-    size: 10.5,
+    y: 580,
+    size: 11,
     font: fontBold,
     color: darkCharcoal,
   });
@@ -159,14 +146,14 @@ export async function generateLetterOfRecognitionPdf(
     // Position QR Code at top right
     page.drawImage(qrImage, {
       x: 485,
-      y: 618,
+      y: 625,
       width: 60,
       height: 60,
     });
 
     page.drawText('VERIFY ONLINE', {
       x: 485,
-      y: 610,
+      y: 617,
       size: 6.5,
       font: fontBold,
       color: apcGreen,
