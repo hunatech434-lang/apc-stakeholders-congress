@@ -11,10 +11,17 @@ import {
   Lock,
   ShieldCheck
 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/seo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+
+  // Do not render public footer on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <footer className="bg-slate-950 text-slate-300 border-t-2 border-brand-500">

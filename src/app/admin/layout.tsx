@@ -11,6 +11,8 @@ export const metadata: Metadata = buildMetadata({
   noIndex: true,
 });
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLayout({
   children,
 }: {
@@ -20,13 +22,13 @@ export default async function AdminLayout({
 
   // If unauthenticated, render children directly without sidebar (e.g. login page)
   if (!session) {
-    return <>{children}</>;
+    return <div className="min-h-screen bg-slate-950 text-slate-100">{children}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col md:flex-row text-slate-100">
+    <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row text-slate-100 antialiased">
       <AdminSidebar session={session} />
-      <main className="flex-1 bg-slate-900 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-screen">
+      <main className="flex-1 bg-slate-900 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-screen w-full">
         <div className="max-w-7xl mx-auto">{children}</div>
       </main>
     </div>

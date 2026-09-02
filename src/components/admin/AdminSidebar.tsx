@@ -54,10 +54,10 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
         {/* Brand header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg p-1 flex-shrink-0 flex items-center justify-center">
+            <div className="w-10 h-10 bg-white rounded-xl p-1 flex-shrink-0 flex items-center justify-center shadow-sm">
               <Image
-                src="/images/APC-stakeholders-congress-Logo.png"
-                alt="APC Logo"
+                src="/images/official-logo.png"
+                alt="APC Official Logo"
                 width={36}
                 height={36}
                 className="object-contain"
@@ -70,7 +70,9 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
           </div>
           {/* Mobile close button */}
           <button 
+            type="button"
             onClick={() => setMobileOpen(false)}
+            aria-label="Close menu"
             className="md:hidden text-slate-400 hover:text-white p-1"
           >
             <X className="w-5 h-5" />
@@ -80,7 +82,7 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
         {/* User badge */}
         <div className="p-4 mx-3 my-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-brand-600/30 border border-brand-500/50 flex items-center justify-center text-brand-400 font-bold text-xs flex-shrink-0">
-            {session.fullName.charAt(0)}
+            {session.fullName ? session.fullName.charAt(0).toUpperCase() : 'A'}
           </div>
           <div className="overflow-hidden">
             <div className="text-xs font-bold text-white truncate">{session.fullName}</div>
@@ -91,15 +93,15 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
         </div>
 
         {/* Navigation Links */}
-        <nav className="px-3 space-y-1.5">
+        <nav className="px-3 space-y-1.5" aria-label="Admin Navigation">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname?.startsWith(item.href));
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition group ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition group cursor-pointer ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-lg shadow-brand-900/30'
                     : 'text-slate-300 hover:text-white hover:bg-slate-900'
@@ -140,10 +142,10 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between">
+      <div className="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-2.5">
           <Image
-            src="/images/APC-stakeholders-congress-Logo.png"
+            src="/images/official-logo.png"
             alt="APC Logo"
             width={28}
             height={28}
@@ -152,7 +154,9 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
           <span className="text-sm font-extrabold text-white">APC Admin Portal</span>
         </div>
         <button
+          type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle admin navigation"
           className="p-2 rounded-lg bg-slate-900 text-slate-300 hover:text-white border border-slate-800"
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -161,15 +165,16 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden bg-slate-950/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 md:hidden bg-slate-950/80 backdrop-blur-sm flex">
           <div className="w-72 bg-slate-950 h-full border-r border-slate-800 shadow-2xl">
             {sidebarContent}
           </div>
+          <div className="flex-1" onClick={() => setMobileOpen(false)}></div>
         </div>
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-slate-950 border-r border-slate-800 flex-col flex-shrink-0 min-h-screen sticky top-0 h-screen">
+      <aside className="hidden md:flex w-64 bg-slate-950 border-r border-slate-800 flex-col flex-shrink-0 min-h-screen sticky top-0 h-screen z-30">
         {sidebarContent}
       </aside>
     </>
