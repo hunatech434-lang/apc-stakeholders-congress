@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo';
 import RegistrationSuccessCard from '@/components/common/RegistrationSuccessCard';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -67,6 +68,9 @@ export default async function StatusPage({
   return (
     <div className="bg-slate-50 min-h-screen py-10 lg:py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ name: 'Check Status', path: '/status' }]} />
+
         {/* Header */}
         <div className="text-center space-y-3 max-w-xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
