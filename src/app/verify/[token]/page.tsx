@@ -106,7 +106,7 @@ export default async function VerifyDocumentPage({
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Authentic & Duly Accredited
               </div>
               <p className="text-xs text-emerald-900 font-medium">
-                This Official Letter of Recognition is genuine and officially recorded.
+                This official accreditation record is genuine and officially cataloged in the State Directorate registry.
               </p>
             </div>
           ) : (

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { registerForumAction, RegistrationResult } from '@/app/actions/registerForum';
 import { section1Schema, section2Schema } from '@/lib/validators';
+import RegistrationSuccessCard from '@/components/common/RegistrationSuccessCard';
 
 const KWARA_LGAS = [
   { id: 1, name: 'Asa', district: 'Kwara Central' },
@@ -958,9 +959,9 @@ export default function RegistrationWizard() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-8 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center gap-2 disabled:opacity-50"
+                className="px-8 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
-                {submitting ? 'Processing & Generating Letter...' : 'Submit Registration'}
+                {submitting ? 'Processing Registration...' : 'Submit Registration'}
                 <CheckCircle2 className="w-4 h-4" />
               </button>
             </div>
@@ -970,74 +971,22 @@ export default function RegistrationWizard() {
 
       {/* ================= STEP 3: SUCCESS & ACCREDITATION ================= */}
       {currentStep === 3 && submitResult && (
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-2xl space-y-8 text-center animate-in zoom-in-95 duration-300">
-          <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-            <ShieldCheck className="w-12 h-12" />
-          </div>
-
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
-              <Sparkles className="w-3.5 h-3.5" /> Registration Approved & Accredited
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Congratulations! Registration Completed
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto">
-              Your forum has been formally approved and admitted as an accredited affiliate of the APC Stakeholders Congress, Kwara State Chapter.
-            </p>
-          </div>
-
-          {/* Reference Card */}
-          <div className="bg-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-200 max-w-md mx-auto space-y-3 text-left">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Official Registration Reference Number
-              </span>
-              <span className="text-lg sm:text-xl font-mono font-black text-brand-700 block">
-                {submitResult.registrationRef}
-              </span>
-            </div>
-            <div className="border-t border-slate-200 pt-3">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Registered Organization
-              </span>
-              <span className="text-sm font-bold text-slate-800 block">
-                {formData.name}
-              </span>
-            </div>
-          </div>
-
-          {/* Download & WhatsApp Actions */}
-          <div className="space-y-4 max-w-md mx-auto">
-            {submitResult.letterDocId && (
-              <a
-                href={`/api/documents/${submitResult.letterDocId}/download`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black rounded-2xl text-sm shadow-lg transition flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                Download Official Letter of Recognition (PDF)
-              </a>
-            )}
-
-            {/* Official WhatsApp Group for Verified Coordinators */}
-            <a
-              href={whatsappGroupLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold rounded-2xl text-sm shadow-md transition flex items-center justify-center gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Join State Coordinators WhatsApp Group
-            </a>
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 max-w-md mx-auto">
-            <p>
-              An official confirmation email containing your Registration Reference ID and Letter of Recognition PDF has been dispatched to your email.
-            </p>
-          </div>
+        <div className="space-y-6">
+          <RegistrationSuccessCard
+            forumName={formData.name}
+            registrationRef={submitResult.registrationRef || ''}
+            coordinatorName={formData.coordinatorName}
+            lgaName={lgas.find((l) => l.id === formData.lgaId)?.name || 'Kwara State'}
+            areaOfCoverage={formData.areaOfCoverage}
+            totalStrength={formData.totalStrength}
+            registeredDate={new Date().toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+            whatsappLink={whatsappGroupLink}
+            showBackToHome={true}
+          />
         </div>
       )}
     </div>

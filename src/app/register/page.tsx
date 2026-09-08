@@ -8,7 +8,7 @@ import { buildMetadata } from '@/lib/seo';
 export const metadata: Metadata = buildMetadata({
   title: 'Register Your Forum | APC Stakeholders Congress Kwara',
   description:
-    'Official online accreditation and registration portal for APC forums, associations, and support groups in Kwara State. Obtain an official Letter of Recognition.',
+    'Official online accreditation and registration portal for APC forums, associations, and support groups in Kwara State. Receive official digital accreditation & membership confirmation.',
   canonicalPath: '/register',
   keywords: [
     'register APC forum',

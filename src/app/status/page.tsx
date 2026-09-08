@@ -1,29 +1,22 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import { 
   Search, 
-  ShieldCheck, 
-  Clock, 
   AlertCircle, 
-  CheckCircle2, 
   XCircle, 
-  FileDown, 
-  MessageCircle,
-  ExternalLink,
-  MapPin,
-  Users,
-  ArrowRight,
-  FileText
+  HelpCircle,
+  PhoneCall
 } from 'lucide-react';
 import { buildMetadata } from '@/lib/seo';
+import RegistrationSuccessCard from '@/components/common/RegistrationSuccessCard';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Check Forum Registration Status',
-  description: 'Lookup registration status and retrieve official accreditation documents.',
+  title: 'Check Forum Registration Status | APC Stakeholders Congress',
+  description: 'Lookup forum registration status and view your official membership confirmation.',
   canonicalPath: '/status',
   noIndex: true,
 });
@@ -44,21 +37,16 @@ export default async function StatusPage({
   if (ref) {
     searchAttempted = true;
     try {
-      // Find forum by reference number
       const found = await prisma.forum.findUnique({
         where: { registrationRef: ref },
         include: {
           lga: true,
-          generatedDocs: {
-            where: { isRevoked: false },
-          },
         },
       });
 
       if (!found) {
-        searchError = `No registration found with reference number "${ref}". Please check and try again.`;
+        searchError = `No registration found with reference number "${ref}". Please verify your reference number and try again.`;
       } else {
-        // If phone provided, verify last 4 digits for extra security
         if (phone) {
           const cleanInput = phone.replace(/\D/g, '');
           const cleanSaved = found.coordinatorPhone.replace(/\D/g, '');
@@ -72,111 +60,27 @@ export default async function StatusPage({
         }
       }
     } catch (e) {
-      searchError = 'A lookup error occurred. Please try again.';
+      searchError = 'A lookup error occurred while searching records. Please try again.';
     }
   }
 
-  const statusBadge = (s: string) => {
-    switch (s) {
-      case 'approved_verified':
-        return (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
-            <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Approved & Accredited</span>
-            </div>
-            <p className="text-xs text-emerald-800 leading-relaxed">
-              Congratulations! Your forum has been accredited by the Kwara State Directorate. Your official Letter of Recognition is available for download below.
-            </p>
-          </div>
-        );
-      case 'under_review':
-        return (
-          <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 space-y-1">
-            <div className="flex items-center gap-2 font-bold text-sm text-blue-800">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <span>Under Formal Review</span>
-            </div>
-            <p className="text-xs text-blue-800 leading-relaxed">
-              Your registration is currently undergoing background vetting and capacity assessment by the Verification Directorate.
-            </p>
-          </div>
-        );
-      case 'more_info_required':
-        return (
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
-            <div className="flex items-center gap-2 font-bold text-sm text-amber-800">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-              <span>Action Required: More Information Requested</span>
-            </div>
-            {forum.queryMessage && (
-              <div className="p-3 rounded-xl bg-white border border-amber-300 text-xs text-amber-950 font-medium leading-relaxed">
-                <strong>Directorate Query:</strong> {forum.queryMessage}
-              </div>
-            )}
-            <p className="text-xs text-amber-800">
-              Please contact the State Secretariat at 07030592380 / 08032010479 / 07031693124 or email apcstakeholderscongress@gmail.com with your reference number to resolve this query.
-            </p>
-          </div>
-        );
-      case 'rejected':
-        return (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 space-y-1">
-            <div className="flex items-center gap-2 font-bold text-sm text-red-800">
-              <XCircle className="w-5 h-5 text-red-600" />
-              <span>Registration Rejected</span>
-            </div>
-            {forum.rejectionReason && (
-              <p className="text-xs text-red-800 font-medium">Reason: {forum.rejectionReason}</p>
-            )}
-          </div>
-        );
-      case 'suspended_revoked':
-        return (
-          <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 space-y-1">
-            <div className="flex items-center gap-2 font-bold text-sm text-purple-800">
-              <AlertCircle className="w-5 h-5 text-purple-600" />
-              <span>Accreditation Suspended / Revoked</span>
-            </div>
-            <p className="text-xs text-purple-800">
-              This forum's recognition has been suspended pending administrative review.
-            </p>
-          </div>
-        );
-      default:
-        return (
-          <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-slate-900 space-y-1">
-            <div className="flex items-center gap-2 font-bold text-sm text-slate-800">
-              <Clock className="w-5 h-5 text-slate-600" />
-              <span>Submitted / Pending Review</span>
-            </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Your submission has been logged and placed into the verification queue.
-            </p>
-          </div>
-        );
-    }
-  };
-
-  const letterDoc = forum?.generatedDocs?.find((d: any) => d.docType === 'letter_of_recognition');
-
   return (
-    <div className="bg-slate-50 min-h-screen py-12 lg:py-20">
+    <div className="bg-slate-50 min-h-screen py-10 lg:py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3 max-w-xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
-            <Search className="w-3.5 h-3.5" /> Registration Status & Document Retrieval
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider rounded-full border border-brand-200">
+            <Search className="w-3.5 h-3.5" /> Registration Status & Verification
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Check Forum Status
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Enter your unique Registration Reference Number to check accreditation status or download your official Letter of Recognition.
+            Enter your unique Registration Reference Number to view your official membership confirmation and connect with the State Directorate.
           </p>
         </div>
 
-        {/* Search Lookup Box */}
+        {/* Search Form */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
           <form method="GET" className="space-y-4">
             <div>
@@ -188,7 +92,7 @@ export default async function StatusPage({
                 name="ref"
                 required
                 defaultValue={ref}
-                placeholder="e.g. APCSC-KW-2026-A1B2C3"
+                placeholder="e.g. APCSC-KW-2026-XXXXXX"
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-mono focus:ring-2 focus:ring-brand-500 uppercase"
               />
             </div>
@@ -196,7 +100,7 @@ export default async function StatusPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Coordinator Phone Number (Optional Verification)
+                  Coordinator Phone Number (Optional)
                 </label>
                 <input
                   type="tel"
@@ -210,18 +114,18 @@ export default async function StatusPage({
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Search className="w-4 h-4" /> Check Status
+                  <Search className="w-4 h-4" /> Check Registration Status
                 </button>
               </div>
             </div>
           </form>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Notification */}
         {searchError && (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-2.5">
+          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-start gap-2.5 animate-in fade-in">
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600 mt-0.5" />
             <div>
               <span className="font-bold">Lookup Error:</span> {searchError}
@@ -229,95 +133,69 @@ export default async function StatusPage({
           </div>
         )}
 
-        {/* Forum Record Found Result */}
+        {/* Results Container */}
         {forum && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-lg space-y-6 animate-in zoom-in-95 duration-200">
-            {/* Status Banner */}
-            {statusBadge(forum.status)}
-
-            {/* Forum Details */}
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">{forum.name}</h3>
-                  <p className="text-slate-500 font-mono mt-0.5">{forum.registrationRef}</p>
+          <div className="space-y-6">
+            {/* Special Administrative Alerts (If rejected or queried) */}
+            {forum.status === 'more_info_required' && (
+              <div className="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-sm text-amber-800">
+                  <AlertCircle className="w-5 h-5 text-amber-600" />
+                  <span>Action Required: More Information Requested by Directorate</span>
                 </div>
-                <span className="text-slate-500 text-[11px]">
-                  Registered: {new Date(forum.createdAt).toLocaleDateString('en-GB')}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-brand-600 flex-shrink-0" />
-                  <span>
-                    <strong>Jurisdiction:</strong> {forum.lga?.name || 'Kwara'} LGA ({forum.areaOfCoverage})
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-sky-600 flex-shrink-0" />
-                  <span>
-                    <strong>Declared Strength:</strong> {forum.totalStrength.toLocaleString()} members
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Official Document Downloads (If Approved) */}
-            {forum.status === 'approved_verified' && (
-              <div className="space-y-4 pt-2 border-t border-slate-100">
-                <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-brand-600" />
-                  Official Accreditation Document
-                </h4>
-
-                <div className="grid grid-cols-1 gap-4">
-                  {letterDoc ? (
-                    <a
-                      href={`/api/documents/${letterDoc.id}/download`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-4 rounded-2xl bg-brand-50 border border-brand-200 hover:border-brand-500 hover:shadow-md transition flex items-center justify-between group"
-                    >
-                      <div>
-                        <div className="font-bold text-brand-950 text-xs sm:text-sm flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-brand-600" />
-                          Official Letter of Recognition / Acceptance
-                        </div>
-                        <div className="text-[11px] text-brand-700 mt-0.5">
-                          Official Letterhead Signed PDF (Tamper-Evident QR Code)
-                        </div>
-                      </div>
-                      <div className="p-2.5 bg-brand-600 group-hover:bg-brand-500 text-white rounded-xl transition">
-                        <FileDown className="w-5 h-5" />
-                      </div>
-                    </a>
-                  ) : (
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
-                      Official Letter of Recognition is being prepared by the Directorate.
-                    </div>
-                  )}
-                </div>
+                {forum.queryMessage && (
+                  <div className="p-3 rounded-xl bg-white border border-amber-200 text-xs font-medium leading-relaxed">
+                    <strong>Directorate Query:</strong> {forum.queryMessage}
+                  </div>
+                )}
+                <p className="text-xs text-amber-800">
+                  Please contact the State Secretariat at 07030592380 / 08032010479 / 07031693124 or email apcstakeholderscongress@gmail.com with your reference number ({forum.registrationRef}) to resolve this query.
+                </p>
               </div>
             )}
 
-            {/* WhatsApp Community Callout */}
-            <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-xs text-emerald-900">
-                <span className="font-bold block">APC Stakeholders WhatsApp Community</span>
-                <span>Stay connected with state directors and grassroots coordinators.</span>
+            {forum.status === 'rejected' && (
+              <div className="p-5 rounded-2xl bg-red-50 border border-red-300 text-red-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-sm text-red-800">
+                  <XCircle className="w-5 h-5 text-red-600" />
+                  <span>Registration Status: Application Rejected</span>
+                </div>
+                {forum.rejectionReason && (
+                  <p className="text-xs text-red-800 font-medium">Reason: {forum.rejectionReason}</p>
+                )}
+                <p className="text-xs text-red-700">
+                  For appeals or clarifications, please contact the Directorate Secretariat.
+                </p>
               </div>
-              <a
-                href="https://chat.whatsapp.com/JykufBzH7AS3wTLIk8XQ8f?s=cl&p=a&mlu=4"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 flex-shrink-0"
-              >
-                <MessageCircle className="w-3.5 h-3.5 fill-current" /> Join WhatsApp Group
-              </a>
-            </div>
+            )}
+
+            {/* Official Screenshot-Ready Registration Confirmation Card */}
+            <RegistrationSuccessCard
+              forumName={forum.name}
+              registrationRef={forum.registrationRef}
+              coordinatorName={forum.coordinatorName}
+              lgaName={forum.lga?.name || 'Kwara State'}
+              areaOfCoverage={forum.areaOfCoverage}
+              totalStrength={forum.totalStrength}
+              registeredDate={new Date(forum.createdAt).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+              showBackToHome={true}
+            />
           </div>
         )}
+
+        {/* Help & Secretariat Contact Box */}
+        <div className="bg-slate-100/80 p-5 rounded-2xl border border-slate-200 text-center space-y-2 text-xs text-slate-600">
+          <div className="flex items-center justify-center gap-1.5 font-bold text-slate-800">
+            <HelpCircle className="w-4 h-4 text-brand-600" /> Need Assistance With Your Registration?
+          </div>
+          <p>
+            Contact the State Secretariat at <strong>07030592380</strong> / <strong>08032010479</strong> / <strong>07031693124</strong> or email <strong>apcstakeholderscongress@gmail.com</strong>
+          </p>
+        </div>
       </div>
     </div>
   );

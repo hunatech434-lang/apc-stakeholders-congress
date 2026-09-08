@@ -46,9 +46,17 @@ export async function updateForumStatus(
       },
     });
 
-    // If approved, trigger document generation automatically if not already issued
-    if (isApproval) {
-      await generateOfficialDocumentsForForum(forum.id);
+    // If approved, send official confirmation email if email exists
+    if (isApproval && forum.forumEmail) {
+      const { sendRegistrationDocumentsEmail } = await import('@/lib/emailService');
+      sendRegistrationDocumentsEmail({
+        toEmail: forum.forumEmail,
+        coordinatorName: forum.coordinatorName,
+        forumName: forum.name,
+        registrationRef: forum.registrationRef,
+        areaOfCoverage: forum.areaOfCoverage,
+        lgaName: forum.lga?.name || 'Kwara State',
+      }).catch((err) => console.error('Admin approval email dispatch error:', err));
     }
 
     // Audit log

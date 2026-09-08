@@ -178,8 +178,8 @@ export default async function HomePage() {
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Official Letter of Recognition</h4>
-                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Receive an official letterhead document verified by the State Directorate.</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">Official Membership Confirmation</h4>
+                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">Obtain official digital accreditation and unique Reference ID verified by the State Directorate.</p>
                   </div>
                 </div>
 
