@@ -43,7 +43,7 @@ export default function Footer() {
               <div className="w-11 h-11 bg-white rounded-xl p-1 flex-shrink-0 flex items-center justify-center shadow-sm">
                 <Image
                   src="/images/official-logo.png"
-                  alt="APC Stakeholders Congress Official Emblem"
+                  alt="Progressive APC Stakeholders Congress Official Emblem"
                   width={42}
                   height={42}
                   className="object-contain"
@@ -169,7 +169,7 @@ export default function Footer() {
         {/* Bottom copyright */}
         <div className="mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <div className="flex items-center gap-2">
-            <p>© {currentYear} APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
+            <p>© {currentYear} Progressive APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
             <Link
               href="/admin/login"
               className="text-slate-700 hover:text-slate-400 transition"

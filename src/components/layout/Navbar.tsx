@@ -53,7 +53,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-400"></span>
             <span className="text-[11px] sm:text-xs text-slate-300 font-normal tracking-wide truncate">
-              APC Stakeholders Congress • Kwara State Chapter • Victory 2027
+              Progressive APC Stakeholders Congress • Kwara State Chapter • Victory 2027
             </span>
           </div>
           <div className="flex items-center gap-3 text-slate-400 text-xs">
@@ -72,7 +72,7 @@ export default function Navbar() {
             <div className="relative w-11 h-11 sm:w-13 sm:h-13 flex-shrink-0 bg-white rounded-xl p-0.5 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/official-logo.png"
-                alt="APC Stakeholders Congress Official Logo"
+                alt="Progressive APC Stakeholders Congress Official Logo"
                 width={50}
                 height={50}
                 priority
@@ -81,7 +81,7 @@ export default function Navbar() {
             </div>
             <div>
               <span className="block text-base sm:text-lg lg:text-xl font-extrabold text-slate-900 tracking-tight leading-tight group-hover:text-brand-700 transition">
-                APC Stakeholders Congress
+                Progressive APC Stakeholders Congress
               </span>
               <span className="block text-xs sm:text-sm font-semibold text-slate-500 leading-tight">
                 Kwara State Chapter

@@ -10,12 +10,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'News & Official Announcements | APC Stakeholders Congress',
+  title: 'News & Official Announcements | Progressive APC Stakeholders Congress',
   description:
-    'Stay updated with official press releases, directives, grassroots mobilization updates, and announcements from the APC Stakeholders Congress Kwara State Directorate.',
+    'Stay updated with official press releases, directives, grassroots mobilization updates, and announcements from the Progressive APC Stakeholders Congress Kwara State Directorate.',
   canonicalPath: '/news',
   keywords: [
-    'APC Stakeholders Congress news',
+    'Progressive APC Stakeholders Congress news',
     'APC Kwara press releases',
     'APC Kwara announcements',
     'grassroots mobilization Kwara',

@@ -28,11 +28,13 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'APC Stakeholders Congress | Kwara State',
+  title: 'Progressive APC Stakeholders Congress | Kwara State',
   description:
-    'APC Stakeholders Congress is a platform for APC forums, associations and support groups in Kwara State to register, connect and coordinate grassroots engagement.',
+    'Progressive APC Stakeholders Congress is a platform for APC forums, associations and support groups in Kwara State to register, connect, download letters of recognition, and coordinate grassroots engagement.',
   canonicalPath: '/',
   keywords: [
+    'Progressive APC Stakeholders Congress',
+    'Progressive APC Stakeholders Congress Kwara',
     'APC Stakeholders Congress',
     'APC Stakeholders Congress Kwara',
     'APC forums in Kwara',
@@ -129,12 +131,12 @@ export default async function HomePage() {
               </div>
               
               <h2 id="about-section-heading" className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                About APC Stakeholders Congress, Kwara State
+                About Progressive APC Stakeholders Congress, Kwara State
               </h2>
 
               <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
                 <p>
-                  The <strong className="text-slate-900 font-bold">APC Stakeholders Congress</strong> serves as the premier platform for organizing, harmonizing, and coordinating the various support groups, professional associations, youth and women organizations, and other stakeholders within the <strong className="text-brand-800 font-bold">All Progressives Congress (APC) across Kwara State</strong>.
+                  The <strong className="text-slate-900 font-bold">Progressive APC Stakeholders Congress</strong> serves as the premier platform for organizing, harmonizing, and coordinating the various support groups, professional associations, youth and women organizations, and other stakeholders within the <strong className="text-brand-800 font-bold">All Progressives Congress (APC) across Kwara State</strong>.
                 </p>
 
                 <p>
@@ -146,7 +148,7 @@ export default async function HomePage() {
                 </p>
 
                 <p>
-                  As we work towards the <strong className="text-brand-800 font-bold">2027 General Elections</strong>, the APC Stakeholders Congress remains committed to strengthening grassroots mobilization, promoting unity among party stakeholders, coordinating support groups, and building a sustainable political network capable of delivering electoral success for the APC in Kwara State.
+                  As we work towards the <strong className="text-brand-800 font-bold">2027 General Elections</strong>, the Progressive APC Stakeholders Congress remains committed to strengthening grassroots mobilization, promoting unity among party stakeholders, coordinating support groups, and building a sustainable political network capable of delivering electoral success for the APC in Kwara State.
                 </p>
               </div>
 

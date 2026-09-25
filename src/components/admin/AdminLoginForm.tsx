@@ -45,7 +45,7 @@ export default function AdminLoginForm() {
         <div className="w-18 h-18 bg-white rounded-2xl p-2 mx-auto shadow-xl flex items-center justify-center border border-slate-700/50">
           <Image
             src="/images/official-logo.png"
-            alt="APC Stakeholders Congress Official Logo"
+            alt="Progressive APC Stakeholders Congress Official Logo"
             width={58}
             height={58}
             priority
@@ -57,7 +57,7 @@ export default function AdminLoginForm() {
           Directorate Administrative Portal
         </h1>
         <p className="text-xs text-slate-400">
-          APC Stakeholders Congress • Kwara State Chapter
+          Progressive APC Stakeholders Congress • Kwara State Chapter
         </p>
       </div>
 

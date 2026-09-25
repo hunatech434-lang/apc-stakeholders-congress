@@ -43,7 +43,7 @@ export default function AboutPage() {
             Official Institutional Profile
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            About APC Stakeholders Congress, Kwara State
+            About Progressive APC Stakeholders Congress, Kwara State
           </h1>
           <p className="text-sm sm:text-base font-semibold text-brand-700 uppercase tracking-wide">
             One Party • One Structure • One Strong Grassroots Movement
@@ -56,7 +56,7 @@ export default function AboutPage() {
             <div className="w-12 h-12 bg-white rounded-2xl p-1 border border-slate-200 shadow-sm flex items-center justify-center flex-shrink-0">
               <Image
                 src="/images/official-logo.png"
-                alt="APC Stakeholders Congress Logo"
+                alt="Progressive APC Stakeholders Congress Logo"
                 width={44}
                 height={44}
                 className="object-contain"
@@ -64,7 +64,7 @@ export default function AboutPage() {
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-tight">
-                APC Stakeholders Congress
+                Progressive APC Stakeholders Congress
               </h2>
               <span className="text-xs font-medium text-slate-500">Kwara State Chapter</span>
             </div>
@@ -72,7 +72,7 @@ export default function AboutPage() {
 
           <div className="space-y-5 text-sm sm:text-base text-slate-700 font-normal">
             <p className="text-slate-800 font-medium leading-relaxed">
-              The <strong className="text-slate-950 font-bold">APC Stakeholders Congress</strong> serves as the premier platform for organizing, harmonizing, and coordinating the various support groups, professional associations, youth and women organizations, and other stakeholders within the <strong className="text-brand-800 font-bold">All Progressives Congress (APC) across Kwara State</strong>.
+              The <strong className="text-slate-950 font-bold">Progressive APC Stakeholders Congress</strong> serves as the premier platform for organizing, harmonizing, and coordinating the various support groups, professional associations, youth and women organizations, and other stakeholders within the <strong className="text-brand-800 font-bold">All Progressives Congress (APC) across Kwara State</strong>.
             </p>
 
             <div className="p-5 rounded-2xl bg-brand-50/70 border border-brand-100/80 space-y-2">
@@ -98,7 +98,7 @@ export default function AboutPage() {
                 <Vote className="w-4 h-4 text-sky-400" /> 2027 General Elections Mandate
               </span>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                As we work towards the <strong className="text-white font-bold">2027 General Elections</strong>, the APC Stakeholders Congress remains committed to strengthening grassroots mobilization, promoting unity among party stakeholders, coordinating support groups, and building a sustainable political network capable of delivering electoral success for the APC in Kwara State.
+                As we work towards the <strong className="text-white font-bold">2027 General Elections</strong>, the Progressive APC Stakeholders Congress remains committed to strengthening grassroots mobilization, promoting unity among party stakeholders, coordinating support groups, and building a sustainable political network capable of delivering electoral success for the APC in Kwara State.
               </p>
             </div>
           </div>

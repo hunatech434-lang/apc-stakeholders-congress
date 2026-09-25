@@ -16,8 +16,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Check Forum Registration Status | APC Stakeholders Congress',
-  description: 'Lookup forum registration status and view your official membership confirmation.',
+  title: 'Check Forum Registration Status | Progressive APC Stakeholders Congress',
+  description: 'Lookup forum registration status and view or download your official membership confirmation and letter of recognition.',
   canonicalPath: '/status',
   noIndex: true,
 });
@@ -80,7 +80,7 @@ export default async function StatusPage({
             Check Forum Status
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Enter your unique Registration Reference Number to view your official membership confirmation and connect with the State Directorate.
+            Enter your unique Registration Reference Number to view your official membership confirmation, download your accredited Letter of Recognition, and connect with the State Directorate.
           </p>
         </div>
 

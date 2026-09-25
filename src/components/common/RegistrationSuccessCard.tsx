@@ -16,7 +16,9 @@ import {
   MapPin,
   Users,
   Calendar,
-  UserCheck
+  UserCheck,
+  FileText,
+  Download
 } from 'lucide-react';
 
 interface RegistrationSuccessCardProps {
@@ -59,7 +61,7 @@ export default function RegistrationSuccessCard({
   };
 
   const shareText = encodeURIComponent(
-    `*CONGRATULATIONS!*\n*REGISTRATION SUCCESSFUL*\n\n${forumName} is now an officially registered member organization of the *APC Stakeholders Congress (Kwara State Chapter)*.\n\n*Official Reference ID:* ${registrationRef}\n\n_Together, we will mobilize, unite, and deliver victory for the APC and the Renewed Hope Agenda in 2027._\n\n_One Party. One Vision. One Nigeria._\n\nVerify online: https://apcstakeholderscongress.org.ng/status?ref=${registrationRef}`
+    `*CONGRATULATIONS!*\n*REGISTRATION SUCCESSFUL*\n\n${forumName} is now an officially registered member organization of the *Progressive APC Stakeholders Congress (Kwara State Chapter)*.\n\n*Official Reference ID:* ${registrationRef}\n\n_Together, we will mobilize, unite, and deliver victory for the APC and the Renewed Hope Agenda in 2027._\n\n_One Party. One Vision. One Nigeria._\n\nVerify online: https://apcstakeholderscongress.org.ng/status?ref=${registrationRef}`
   );
 
   return (
@@ -81,7 +83,7 @@ export default function RegistrationSuccessCard({
             <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-white shadow-md ring-4 ring-brand-500/20 flex items-center justify-center">
               <Image
                 src="/images/official-logo.png"
-                alt="APC Stakeholders Congress Official Logo"
+                alt="Progressive APC Stakeholders Congress Official Logo"
                 width={112}
                 height={112}
                 className="object-contain w-full h-full rounded-full"
@@ -94,7 +96,7 @@ export default function RegistrationSuccessCard({
                 All Progressives Congress • Kwara State
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
-                APC Stakeholders Congress
+                Progressive APC Stakeholders Congress
               </h3>
               <p className="text-xs sm:text-sm font-semibold text-slate-500">
                 Directorate of Support Groups & Grassroots Mobilization
@@ -125,7 +127,7 @@ export default function RegistrationSuccessCard({
               </p>
               <p className="text-xs sm:text-sm font-medium text-slate-700">
                 is now a proud member of the{' '}
-                <strong className="text-brand-800 font-extrabold">APC Stakeholders Congress</strong>
+                <strong className="text-brand-800 font-extrabold">Progressive APC Stakeholders Congress</strong>
               </p>
             </div>
           </div>
@@ -234,14 +236,36 @@ export default function RegistrationSuccessCard({
 
           {/* Primary Action Buttons */}
           <div className="pt-2 space-y-3">
+            {/* Download Letter of Recognition CTA */}
+            <a
+              href={`/api/documents/letter/${registrationRef}/download`}
+              target="_blank"
+              rel="noopener noreferrer"
+              download={`Progressive_APC_Letter_of_Recognition_${registrationRef}.pdf`}
+              className="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 via-brand-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 active:scale-[0.99] text-white font-black rounded-2xl text-sm sm:text-base shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 group cursor-pointer border border-emerald-400/40"
+            >
+              <div className="p-2 rounded-xl bg-white/20 group-hover:bg-white/30 transition-colors">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1.5 font-black">
+                  <span>Download Official Letter of Recognition</span>
+                  <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                </div>
+                <p className="text-[11px] font-medium text-emerald-100">
+                  Accredited PDF Letterhead with Instant QR Verification
+                </p>
+              </div>
+            </a>
+
             {/* WhatsApp Community CTA */}
             <a
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-4 px-6 bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-black rounded-2xl text-sm sm:text-base shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2.5 group cursor-pointer"
+              className="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold rounded-2xl text-sm sm:text-base shadow hover:shadow-md transition flex items-center justify-center gap-2.5 group cursor-pointer border border-slate-700"
             >
-              <MessageCircle className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" />
+              <MessageCircle className="w-5 h-5 fill-emerald-400 text-emerald-400 group-hover:scale-110 transition-transform" />
               <span>Join Official WhatsApp Community</span>
             </a>
 
@@ -280,7 +304,7 @@ export default function RegistrationSuccessCard({
           {/* Official Footnote */}
           <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
             <p>
-              Official accreditation cataloged in the <strong>State Directorate Registry</strong>. Take a screenshot of this card or note your Reference ID for admittance into congress conventions and inauguration ceremonies.
+              Official accreditation cataloged in the <strong>State Directorate Registry</strong>. Download your Letter of Recognition or take a screenshot of this card for admittance into congress conventions and inauguration ceremonies.
             </p>
           </div>
         </div>

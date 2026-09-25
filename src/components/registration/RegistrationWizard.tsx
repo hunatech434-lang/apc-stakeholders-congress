@@ -902,7 +902,7 @@ export default function RegistrationWizard() {
                   className="w-4 h-4 mt-0.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300 cursor-pointer"
                 />
                 <span className="text-xs text-slate-700 leading-relaxed font-medium">
-                  We agree to align with the guidelines, leadership, directives, and harmonized structure of the APC Stakeholders Congress, Kwara State Chapter. <span className="text-red-500">*</span>
+                  We agree to align with the guidelines, leadership, directives, and harmonized structure of the Progressive APC Stakeholders Congress, Kwara State Chapter. <span className="text-red-500">*</span>
                 </span>
               </label>
 

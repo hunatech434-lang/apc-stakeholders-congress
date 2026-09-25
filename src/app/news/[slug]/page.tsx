@@ -67,11 +67,11 @@ export async function generateMetadata({
     image: post.featuredImageUrl || SITE_CONFIG.images.ogDefault,
     publishedTime: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
     modifiedTime: post.createdAt.toISOString(),
-    authors: [post.author?.fullName || 'APC Stakeholders Congress Directorate'],
+    authors: [post.author?.fullName || 'Progressive APC Stakeholders Congress Directorate'],
     keywords: [
       post.title,
       post.category,
-      'APC Stakeholders Congress',
+      'Progressive APC Stakeholders Congress',
       'APC Kwara News',
       'Victory 2027',
     ],
@@ -110,7 +110,7 @@ export default async function NewsArticlePage({
     publishedAt: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
     updatedAt: post.createdAt.toISOString(),
     imageUrl: post.featuredImageUrl || undefined,
-    authorName: post.author?.fullName || 'APC Stakeholders Congress Directorate',
+    authorName: post.author?.fullName || 'Progressive APC Stakeholders Congress Directorate',
   });
 
   const breadcrumbItems = [
@@ -201,7 +201,7 @@ export default async function NewsArticlePage({
               <div className="space-y-1 text-xs">
                 <span className="font-bold text-brand-950 block">Official Party Release</span>
                 <p className="text-brand-800">
-                  Issued by the Directorate of Media & Publicity, APC Stakeholders Congress (Kwara State Chapter).
+                  Issued by the Directorate of Media & Publicity, Progressive APC Stakeholders Congress (Kwara State Chapter).
                 </p>
               </div>
               <Link

@@ -17,7 +17,7 @@ export interface ForumDocData {
 }
 
 /**
- * Generates an official Letter of Recognition on the official APC Stakeholder Congress letterhead.
+ * Generates an official Letter of Recognition on the official Progressive APC Stakeholder Congress letterhead.
  */
 export async function generateLetterOfRecognitionPdf(
   forum: ForumDocData,
@@ -25,8 +25,9 @@ export async function generateLetterOfRecognitionPdf(
   appUrl: string = process.env.NEXT_PUBLIC_APP_URL || 'https://apcstakeholderscongress.org.ng'
 ): Promise<Buffer> {
   // 1. Locate and load the official PDF template
-  const primaryPath = path.join(process.cwd(), 'resources', 'APC Stakeholders Congress Letter of Recognition.pdf');
-  const fallbackPath = path.join(process.cwd(), 'public', 'templates', 'letter_template.pdf');
+  const primaryPath = path.join(process.cwd(), 'resources', 'Progressive APC Stakeholders Congress Letter of Recognition.pdf');
+  const fallbackPath = path.join(process.cwd(), 'public', 'templates', 'Progressive APC Stakeholders Congress Letter of Recognition.pdf');
+  const legacyFallbackPath = path.join(process.cwd(), 'public', 'templates', 'letter_template.pdf');
   
   let templateBytes: Buffer | null = null;
   try {
@@ -34,6 +35,8 @@ export async function generateLetterOfRecognitionPdf(
       templateBytes = fs.readFileSync(primaryPath);
     } else if (fs.existsSync(fallbackPath)) {
       templateBytes = fs.readFileSync(fallbackPath);
+    } else if (fs.existsSync(legacyFallbackPath)) {
+      templateBytes = fs.readFileSync(legacyFallbackPath);
     }
   } catch (err) {
     console.error('Failed to read official letterhead template:', err);

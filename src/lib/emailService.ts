@@ -7,6 +7,8 @@ interface SendRegistrationDocumentsParams {
   registrationRef: string;
   areaOfCoverage?: string;
   lgaName?: string;
+  letterPdfBuffer?: Buffer;
+  letterDocId?: string;
 }
 
 export async function sendRegistrationDocumentsEmail(
@@ -17,7 +19,7 @@ export async function sendRegistrationDocumentsEmail(
   const secure = process.env.SMTP_SECURE === 'true' || port === 465;
   const user = process.env.SMTP_USER || '';
   const pass = process.env.SMTP_PASS || '';
-  const from = process.env.SMTP_FROM || `"APC Stakeholders Congress" <${user || 'apcstakeholderscongress@gmail.com'}>`;
+  const from = process.env.SMTP_FROM || `"Progressive APC Stakeholders Congress" <${user || 'apcstakeholderscongress@gmail.com'}>`;
   const whatsappLink = process.env.NEXT_PUBLIC_WHATSAPP_LINK || 'https://chat.whatsapp.com/JykufBzH7AS3wTLIk8XQ8f?s=cl&p=a&mlu=4';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://apcstakeholderscongress.org.ng';
 
@@ -45,13 +47,15 @@ export async function sendRegistrationDocumentsEmail(
       },
     });
 
+    const downloadLetterUrl = `${appUrl}/api/documents/letter/${params.registrationRef}/download`;
+
     const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Registration Successful - APC Stakeholders Congress</title>
+      <title>Registration Successful - Progressive APC Stakeholders Congress</title>
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
         .container { max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
@@ -66,6 +70,9 @@ export async function sendRegistrationDocumentsEmail(
         .ref-box { background: #0f172a; color: #ffffff; border-radius: 10px; padding: 16px; text-align: center; margin: 20px 0; }
         .ref-label { font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .ref-code { font-family: Consolas, Monaco, monospace; font-size: 20px; font-weight: 800; color: #4ade80; letter-spacing: 1px; }
+        .letter-card { background: #f8fafc; border: 2px dashed #008751; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0; }
+        .letter-title { color: #008751; font-size: 14px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+        .btn-letter { display: inline-block; background: #008751; color: #ffffff !important; text-decoration: none; padding: 11px 22px; border-radius: 8px; font-weight: 800; font-size: 13px; margin-top: 8px; }
         .info-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; background: #f8fafc; border-radius: 8px; overflow: hidden; }
         .info-table td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
         .info-table td.label { font-weight: 700; color: #64748b; width: 38%; }
@@ -85,8 +92,8 @@ export async function sendRegistrationDocumentsEmail(
     <body>
       <div className="container">
         <div className="header">
-          <h1>APC STAKEHOLDERS CONGRESS</h1>
-          <p>Kwara State Chapter • Directorate of Support Groups & Forums</p>
+          <h1>PROGRESSIVE APC STAKEHOLDERS CONGRESS</h1>
+          <p>Kwara State Chapter • Directorate of Support Groups & Grassroots Mobilization</p>
         </div>
         
         <div className="content">
@@ -95,13 +102,22 @@ export async function sendRegistrationDocumentsEmail(
             <div className="congrats-sub">REGISTRATION SUCCESSFUL</div>
             <div className="forum-highlight">
               Congratulations!<br>
-              <strong>${params.forumName}</strong> is now a proud member of the <strong>APC Stakeholders Congress</strong>.
+              <strong>${params.forumName}</strong> is now a proud member of the <strong>Progressive APC Stakeholders Congress</strong>.
             </div>
           </div>
 
           <div className="ref-box">
             <div className="ref-label">Official Registration Reference ID</div>
             <div className="ref-code">${params.registrationRef}</div>
+          </div>
+
+          <!-- Official Letter of Recognition Section -->
+          <div className="letter-card">
+            <div className="letter-title">📄 Official Letter of Recognition</div>
+            <p style="margin: 0; font-size: 12px; color: #475569;">
+              ${params.letterPdfBuffer ? 'Your official Letter of Recognition has been generated and attached to this email.' : 'Your official Letter of Recognition is ready for download.'}
+            </p>
+            <a href="${downloadLetterUrl}" className="btn-letter">Download Official Letter (PDF)</a>
           </div>
 
           <table className="info-table">
@@ -141,7 +157,7 @@ export async function sendRegistrationDocumentsEmail(
           </div>
 
           <div className="portal-link">
-            Check your registration anytime on the portal: <br>
+            Check your registration & letter anytime on the portal: <br>
             <a href="${appUrl}/status?ref=${params.registrationRef}">${appUrl}/status?ref=${params.registrationRef}</a>
           </div>
 
@@ -151,8 +167,8 @@ export async function sendRegistrationDocumentsEmail(
         </div>
 
         <div className="footer">
-          <p>© ${new Date().getFullYear()} APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
-          <p>Unity • Loyalty • Service • Integrity • Grassroots Mobilization</p>
+          <p>© ${new Date().getFullYear()} Progressive APC Stakeholders Congress (Kwara State Chapter). All rights reserved.</p>
+          <p>Unity • Service • Progress • Grassroots Mobilization</p>
         </div>
       </div>
     </body>
@@ -164,11 +180,14 @@ CONGRATULATIONS!
 REGISTRATION SUCCESSFUL
 
 Congratulations!
-${params.forumName} is now a proud member of the APC Stakeholders Congress (Kwara State Chapter).
+${params.forumName} is now a proud member of the Progressive APC Stakeholders Congress (Kwara State Chapter).
 
 Official Registration Reference ID: ${params.registrationRef}
 Coordinator: ${params.coordinatorName}
 Jurisdiction: ${params.lgaName || 'Kwara State'} ${params.areaOfCoverage ? `(${params.areaOfCoverage})` : ''}
+
+Download Official Letter of Recognition:
+${downloadLetterUrl}
 
 "Together, we will mobilize, unite, and deliver victory for the APC and the Renewed Hope Agenda in 2027. Thank you for joining the movement to build a stronger party and a better Nigeria."
 
@@ -186,13 +205,25 @@ State Secretariat: 07030592380 / 08032010479 / 07031693124
 Email: apcstakeholderscongress@gmail.com
     `.trim();
 
-    await transporter.sendMail({
+    const mailOptions: any = {
       from,
       to: params.toEmail,
       subject: `Registration Successful - ${params.forumName} (${params.registrationRef})`,
       text: plainText,
       html: htmlContent,
-    });
+    };
+
+    if (params.letterPdfBuffer) {
+      mailOptions.attachments = [
+        {
+          filename: `Progressive_APC_Letter_of_Recognition_${params.registrationRef}.pdf`,
+          content: params.letterPdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ];
+    }
+
+    await transporter.sendMail(mailOptions);
 
     console.log(`[SMTP Success] Confirmation email dispatched to ${params.toEmail}`);
     return { success: true };

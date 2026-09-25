@@ -61,7 +61,7 @@ export default function HeroCarousel() {
           >
             <Image
               src={src}
-              alt={`APC Stakeholders Congress Kwara grassroots mobilization rally - photo ${idx + 1}`}
+              alt={`Progressive APC Stakeholders Congress Kwara grassroots mobilization rally - photo ${idx + 1}`}
               fill
               priority={idx === 0}
               className="object-cover object-center"

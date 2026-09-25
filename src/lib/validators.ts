@@ -74,7 +74,7 @@ export const section2Schema = z.object({
     message: 'Commitment to work for APC victory in 2027 is required',
   }),
   agreeWithCongress: z.boolean().refine((val) => val === true, {
-    message: 'Agreement to align with APC Stakeholders Congress is required',
+    message: 'Agreement to align with Progressive APC Stakeholders Congress is required',
   }),
   declarationConfirmed: z.boolean().refine((val) => val === true, {
     message: 'You must confirm the truthfulness of the provided information',

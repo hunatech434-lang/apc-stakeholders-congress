@@ -46,8 +46,16 @@ export async function updateForumStatus(
       },
     });
 
-    // If approved, send official confirmation email if email exists
+    // If approved, ensure official letter is ready and send confirmation email if email exists
     if (isApproval && forum.forumEmail) {
+      let letterDocId: string | undefined = undefined;
+      try {
+        const docs = await generateOfficialDocumentsForForum(forum.id);
+        letterDocId = docs.letter.id;
+      } catch (docErr) {
+        console.warn('Document pre-generation during admin approval:', docErr);
+      }
+
       const { sendRegistrationDocumentsEmail } = await import('@/lib/emailService');
       sendRegistrationDocumentsEmail({
         toEmail: forum.forumEmail,
@@ -56,6 +64,7 @@ export async function updateForumStatus(
         registrationRef: forum.registrationRef,
         areaOfCoverage: forum.areaOfCoverage,
         lgaName: forum.lga?.name || 'Kwara State',
+        letterDocId,
       }).catch((err) => console.error('Admin approval email dispatch error:', err));
     }
 
@@ -112,7 +121,7 @@ export async function generateOfficialDocumentsForForum(forumId: string) {
     officeAddress: forum.officeAddress,
   };
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://apc-stakeholders-congress.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://apcstakeholderscongress.org.ng';
 
   // Official Letter of Recognition
   let letterDoc = await prisma.generatedDocument.findFirst({

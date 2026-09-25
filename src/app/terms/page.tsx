@@ -4,7 +4,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Terms of Registration & Accreditation | APC Stakeholders Congress',
+  title: 'Terms of Registration & Accreditation | Progressive APC Stakeholders Congress',
   description:
     'Official terms and conditions governing the accreditation and recognition of APC forums, associations, and support groups in Kwara State.',
   canonicalPath: '/terms',
@@ -27,7 +27,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-base font-bold text-slate-900">1. Acceptance of Terms</h2>
             <p>
-              By submitting a forum registration on the APC Stakeholders Congress Portal, the submitting Coordinator or Secretary warrants that they possess the legitimate authority to represent the organization and that all submitted particulars are accurate and truthful.
+              By submitting a forum registration on the Progressive APC Stakeholders Congress Portal, the submitting Coordinator or Secretary warrants that they possess the legitimate authority to represent the organization and that all submitted particulars are accurate and truthful.
             </p>
           </section>
 
@@ -41,7 +41,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-base font-bold text-slate-900">3. Nature of Accreditation</h2>
             <p>
-              Digital registration and accreditation under the APC Stakeholders Congress signifies formal recognition as an aligned support group. It does not replace statutory party primary elections or official party constitution organs.
+              Digital registration and accreditation under the Progressive APC Stakeholders Congress signifies formal recognition as an aligned support group. It does not replace statutory party primary elections or official party constitution organs.
             </p>
           </section>
 

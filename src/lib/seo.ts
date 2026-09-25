@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 
 export const SITE_CONFIG = {
-  name: 'APC Stakeholders Congress',
-  shortName: 'APC Congress',
+  name: 'Progressive APC Stakeholders Congress',
+  shortName: 'Progressive APC Congress',
   chapterName: 'Kwara State Chapter',
   canonicalDomain: 'https://apcstakeholderscongress.org.ng',
   officialTagline: 'Uniting APC Stakeholders for Victory 2027',
-  defaultTitle: 'APC Stakeholders Congress | Kwara State',
-  titleTemplate: '%s | APC Stakeholders Congress',
+  defaultTitle: 'Progressive APC Stakeholders Congress | Kwara State',
+  titleTemplate: '%s | Progressive APC Stakeholders Congress',
   defaultDescription:
-    'APC Stakeholders Congress is the official platform for APC forums, associations and support groups in Kwara State to register, connect, obtain official accreditation and coordinate grassroots engagement for Victory 2027.',
+    'Progressive APC Stakeholders Congress is the official platform for APC forums, associations and support groups in Kwara State to register, connect, obtain official accreditation, download letters of recognition, and coordinate grassroots engagement for Victory 2027.',
   parentOrganization: 'All Progressives Congress (APC)',
   secretariatAddress: {
     streetAddress: 'APC Kwara North House, Fate Road',
@@ -33,6 +33,8 @@ export const SITE_CONFIG = {
     heroDefault: '/images/hero/1.png',
   },
   keywords: [
+    'Progressive APC Stakeholders Congress',
+    'Progressive APC Stakeholders Congress Kwara',
     'APC Stakeholders Congress',
     'APC Stakeholders Congress Kwara',
     'APC Stakeholders Congress Nigeria',
@@ -102,7 +104,7 @@ export function buildMetadata(options: MetadataOptions = {}): Metadata {
     noIndex = false,
     publishedTime,
     modifiedTime,
-    authors = ['APC Stakeholders Congress Directorate'],
+    authors = ['Progressive APC Stakeholders Congress Directorate'],
     keywords = SITE_CONFIG.keywords,
   } = options;
 
@@ -186,8 +188,9 @@ export function generateOrganizationSchema() {
     '@id': `${SITE_CONFIG.canonicalDomain}/#organization`,
     name: SITE_CONFIG.name,
     alternateName: [
+      'Progressive APC Stakeholders Congress Kwara',
       'APC Stakeholders Congress Kwara',
-      'APC Stakeholders Congress Kwara State Chapter',
+      'Progressive APC Stakeholders Congress Kwara State Chapter',
       'APCSC Kwara',
     ],
     url: SITE_CONFIG.canonicalDomain,
@@ -299,7 +302,7 @@ export function generateArticleSchema({
   publishedAt,
   updatedAt,
   imageUrl,
-  authorName = 'APC Stakeholders Congress Directorate',
+  authorName = 'Progressive APC Stakeholders Congress Directorate',
 }: {
   title: string;
   description: string;
@@ -438,7 +441,7 @@ export function generateVerifiedGroupSchema({
     ...(acronym && { alternateName: acronym }),
     ...(motto && { slogan: motto }),
     url: profileUrl,
-    description: `Officially accredited APC support group and grassroots forum operating in ${lgaName} LGA (${areaOfCoverage}), Kwara State. Accredited under the APC Stakeholders Congress.`,
+    description: `Officially accredited APC support group and grassroots forum operating in ${lgaName} LGA (${areaOfCoverage}), Kwara State. Accredited under the Progressive APC Stakeholders Congress.`,
     ...(yearEstablished && { foundingDate: yearEstablished.toString() }),
     ...(totalStrength && {
       member: {

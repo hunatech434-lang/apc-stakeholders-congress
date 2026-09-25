@@ -193,7 +193,43 @@ export async function submitForumRegistration(
       return createdForum;
     });
 
-    // 6. DISPATCH OFFICIAL REGISTRATION CONFIRMATION EMAIL VIA SMTP (Non-blocking)
+    // 6. GENERATE OFFICIAL LETTER OF RECOGNITION (Dynamic & Resilient)
+    let letterDocId: string | undefined = undefined;
+    let letterPdfBuffer: Buffer | undefined = undefined;
+    try {
+      const letterToken = generateVerificationToken();
+      const docForumData = {
+        id: forum.id,
+        name: forum.name,
+        registrationRef: forum.registrationRef,
+        lgaName: lga?.name || 'Kwara State',
+        areaOfCoverage: forum.areaOfCoverage,
+        stateName: 'Kwara State',
+        yearEstablished: forum.yearEstablished,
+        approvedAt: forum.approvedAt || now,
+        coordinatorName: forum.coordinatorName,
+        officeAddress: forum.officeAddress || undefined,
+      };
+
+      const buf = await generateLetterOfRecognitionPdf(docForumData, letterToken);
+      letterPdfBuffer = buf;
+      const fileName = `letter_${forum.registrationRef.replace(/[^a-zA-Z0-9]/g, '_')}_${letterToken.slice(0, 8)}.pdf`;
+
+      const createdDoc = await prisma.generatedDocument.create({
+        data: {
+          forumId: forum.id,
+          docType: 'letter_of_recognition',
+          verificationToken: letterToken,
+          filePath: `/storage/generated/${fileName}`,
+          fileSizeBytes: buf.length,
+        },
+      });
+      letterDocId = createdDoc.id;
+    } catch (docErr) {
+      console.error('Initial letter generation error (will fallback on-demand):', docErr);
+    }
+
+    // 7. DISPATCH OFFICIAL REGISTRATION CONFIRMATION EMAIL VIA SMTP (Non-blocking)
     const recipientEmail = validData.forumEmail;
     if (recipientEmail) {
       sendRegistrationDocumentsEmail({
@@ -203,10 +239,12 @@ export async function submitForumRegistration(
         registrationRef: forum.registrationRef,
         areaOfCoverage: forum.areaOfCoverage,
         lgaName: lga?.name || 'Kwara State',
+        letterPdfBuffer,
+        letterDocId,
       }).catch((err) => console.error('Background email dispatch error:', err));
     }
 
-    // 7. Real-Time Google Drive / Google Sheets Sync (Non-blocking)
+    // 8. Real-Time Google Drive / Google Sheets Sync (Non-blocking)
     syncForumToGoogleDrive({
       timestamp: now.toISOString(),
       registrationRef: forum.registrationRef,
@@ -228,7 +266,7 @@ export async function submitForumRegistration(
       status: 'APPROVED_VERIFIED',
     }).catch((err) => console.error('Background Google Drive sync error:', err));
 
-    // 8. Log Audit
+    // 9. Log Audit
     await logAudit({
       action: 'REGISTRATION_AUTO_APPROVED',
       entity: 'Forum',
@@ -240,6 +278,7 @@ export async function submitForumRegistration(
         lga: lga?.name || 'Kwara State',
         areaOfCoverage: validData.areaOfCoverage,
         declaredStrength: forum.totalStrength,
+        letterDocId,
       },
     });
 
@@ -247,6 +286,7 @@ export async function submitForumRegistration(
       success: true,
       registrationRef: forum.registrationRef,
       forumId: forum.id,
+      letterDocId,
     };
   } catch (error: any) {
     console.error('Registration submission error:', error);

@@ -191,7 +191,7 @@ export default function AdminCmsManager({
                   type="text"
                   name="title"
                   required
-                  placeholder="e.g. APC Stakeholders Congress Convenes Statewide Summit"
+                  placeholder="e.g. Progressive APC Stakeholders Congress Convenes Statewide Summit"
                   className="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500"
                 />
               </div>

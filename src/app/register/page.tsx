@@ -6,7 +6,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Register Your Forum | APC Stakeholders Congress Kwara',
+  title: 'Register Your Forum | Progressive APC Stakeholders Congress Kwara',
   description:
     'Official online accreditation and registration portal for APC forums, associations, and support groups in Kwara State. Receive official digital accreditation & membership confirmation.',
   canonicalPath: '/register',
@@ -36,7 +36,7 @@ export default function RegisterPage() {
             Forum & Support Group Registration
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Complete the 2-section form to register and accredit your association under the APC Stakeholders Congress (Kwara State Chapter).
+            Complete the 2-section form to register and accredit your association under the Progressive APC Stakeholders Congress (Kwara State Chapter).
           </p>
         </div>
 

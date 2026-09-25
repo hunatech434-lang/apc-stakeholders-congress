@@ -58,7 +58,7 @@ export default async function VerifyDocumentPage({
           </div>
           <h1 className="text-xl font-extrabold text-slate-900">Document Not Found</h1>
           <p className="text-xs text-slate-600 leading-relaxed">
-            The verification token provided does not match any official accredited document issued by the APC Stakeholders Congress.
+            The verification token provided does not match any official accredited document issued by the Progressive APC Stakeholders Congress.
           </p>
           <div className="pt-2">
             <Link
@@ -94,7 +94,7 @@ export default async function VerifyDocumentPage({
             Official Document Verification Portal
           </span>
           <h1 className="text-lg font-extrabold text-white">
-            APC Stakeholders Congress (Kwara State)
+            Progressive APC Stakeholders Congress (Kwara State)
           </h1>
         </div>
 
@@ -167,7 +167,7 @@ export default async function VerifyDocumentPage({
               href="/"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:underline"
             >
-              <span>Visit Official APC Stakeholders Congress Portal</span>
+              <span>Visit Official Progressive APC Stakeholders Congress Portal</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

@@ -57,14 +57,14 @@ export function AdminSidebar({ session }: AdminSidebarProps) {
             <div className="w-10 h-10 bg-white rounded-xl p-1 flex-shrink-0 flex items-center justify-center shadow-sm">
               <Image
                 src="/images/official-logo.png"
-                alt="APC Official Logo"
+                alt="Progressive APC Official Logo"
                 width={36}
                 height={36}
                 className="object-contain"
               />
             </div>
             <div>
-              <span className="text-xs font-bold text-slate-300 block">APC Directorate</span>
+              <span className="text-xs font-bold text-slate-300 block">Progressive APC</span>
               <span className="text-sm font-extrabold text-white tracking-tight block">Kwara Portal</span>
             </div>
           </div>

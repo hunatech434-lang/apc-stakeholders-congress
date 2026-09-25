@@ -5,7 +5,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Data Privacy & Protection Policy | APC Stakeholders Congress',
+  title: 'Data Privacy & Protection Policy | Progressive APC Stakeholders Congress',
   description:
     'Official data privacy policy and protection standards for registered APC forums, coordinators, and stakeholders in Kwara State.',
   canonicalPath: '/privacy',
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           <section className="space-y-2">
             <h2 className="text-base font-bold text-slate-900">1. Purpose and Scope</h2>
             <p>
-              The APC Stakeholders Congress Portal (Kwara State Chapter) operates under strict data minimization and lawful processing principles. We collect, store, and process organizational and contact information solely for the administration, accreditation, verification, and legitimate party coordination of affiliated forums and support groups.
+              The Progressive APC Stakeholders Congress Portal (Kwara State Chapter) operates under strict data minimization and lawful processing principles. We collect, store, and process organizational and contact information solely for the administration, accreditation, verification, and legitimate party coordination of affiliated forums and support groups.
             </p>
           </section>
 

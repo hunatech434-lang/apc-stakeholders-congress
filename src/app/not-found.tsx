@@ -14,7 +14,7 @@ import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Page Not Found',
-  description: 'The requested page could not be found on the APC Stakeholders Congress Portal.',
+  description: 'The requested page could not be found on the Progressive APC Stakeholders Congress Portal.',
   canonicalPath: '/404',
   noIndex: true,
 });
